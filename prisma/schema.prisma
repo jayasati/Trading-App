@@ -13,6 +13,15 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
 
 enum OrderType {
   MARKET
@@ -37,11 +46,28 @@ model User {
   email     String   @unique
   password  String
   name      String?
+
+  role      Role     @default(USER)
+  status    AccountStatus @default(ACTIVE)
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   wallet    Wallet?
   orders    Order[]
+  refreshTokens RefreshToken[]
 }
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+
 
 model Wallet {
   id        String   @id @default(uuid())
