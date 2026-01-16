@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+   output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP_LOSS
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  OPEN
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+
+  wallet    Wallet?
+  orders    Order[]
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  balance   Decimal  @db.Decimal(18, 2)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Stock {
+  id        String   @id @default(uuid())
+  symbol    String   @unique
+  name      String
+  exchange  String
+  isActive  Boolean  @default(true)
+
+  orders    Order[]
+  trades    Trade[]
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String
+  stockId    String
+
+  type       OrderType
+  side       OrderSide
+  price      Decimal?    @db.Decimal(18, 2)
+  quantity   Int
+  filledQty  Int         @default(0)
+
+  status     OrderStatus @default(OPEN)
+
+  user       User        @relation(fields: [userId], references: [id])
+  stock      Stock       @relation(fields: [stockId], references: [id])
+
+  buyTrades  Trade[]     @relation("BuyOrder")
+  sellTrades Trade[]     @relation("SellOrder")
+
+  createdAt  DateTime    @default(now())
+}
+
+model Trade {
+  id           String   @id @default(uuid())
+
+  buyOrderId   String
+  sellOrderId  String
+  stockId      String
+
+  price        Decimal  @db.Decimal(18, 2)
+  quantity     Int
+
+  buyOrder   Order @relation("BuyOrder", fields: [buyOrderId], references: [id])
+  sellOrder  Order @relation("SellOrder", fields: [sellOrderId], references: [id])
+  stock      Stock @relation(fields: [stockId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+

@@ -1,0 +1,55 @@
+Purpose of this folder
+
+The Prisma folder exists to centralize database access.
+---------------------------------------------------------------------
+Instead of:
+#Creating PrismaClient everywhere
+#Managing connections manually
+#Repeating logic in every module
+#You keep all DB-related logic in one place.
+
+Problems it prevents
+❌ Multiple DB connections
+❌ Code duplication
+❌ Hard-to-manage lifecycle
+❌ Poor testability
+-----------------------------------------------------------------------
+2️⃣ Why not use PrismaClient directly in every service?
+
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+
+#Every import can create a new DB connection
+#No lifecycle control (onModuleInit, enableShutdownHooks)
+#Hard to mock for testing
+#Breaks NestJS dependency injection philosophy
+#NestJS is DI-first, PrismaClient is not DI-aware by default.
+
+
+-------------------------------------------------------------
+What this gives you
+
+✅ Single PrismaClient instance
+✅ Proper DB connection handling
+✅ Works with NestJS lifecycle
+✅ Injectable anywhere
+
+-------------------------------------------------------------
+Now instead of:
+const prisma = new PrismaClient();
+
+You do:
+constructor(private prisma: PrismaService) {}
+
+---------------------------------------------------------------
+
+What if you skip this pattern?
+
+You’ll face:
+
+❌ PrismaClient instantiated multiple times
+❌ PostgreSQL connection limit issues
+❌ Messy imports
+❌ Harder testing
+❌ Harder scaling
