@@ -10,7 +10,7 @@ import { randomUUID } from 'crypto';
 
 import { UsersService } from '../users/users.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { use } from 'passport';
+
 
 
 @Injectable()
@@ -74,6 +74,9 @@ export class AuthService{
         }
 
         const isMatch=await bcrypt.compare(password,user.password);
+        if(!isMatch){
+            throw new UnauthorizedException('Invalid Credentials');
+        }
         return this.issueTokens(user.id,user.email,user.role);
 
     }
