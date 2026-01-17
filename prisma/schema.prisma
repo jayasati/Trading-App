@@ -86,6 +86,8 @@ model Stock {
 
   orders    Order[]
   trades    Trade[]
+  priceHistory  PriceHistory[]
+  createdAt DateTime @default(now())
 }
 
 model Order {
@@ -108,6 +110,7 @@ model Order {
   sellTrades Trade[]     @relation("SellOrder")
 
   createdAt  DateTime    @default(now())
+
 }
 
 model Trade {
@@ -126,4 +129,17 @@ model Trade {
 
   createdAt DateTime @default(now())
 }
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  stockId   String
+  price     Decimal  @db.Decimal(18, 2)
+  volume    Int?
+  timestamp DateTime @default(now())
+
+  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@index([stockId, timestamp])
+}
+
 

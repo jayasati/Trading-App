@@ -30,6 +30,7 @@ export type StockMinAggregateOutputType = {
   name: string | null
   exchange: string | null
   isActive: boolean | null
+  createdAt: Date | null
 }
 
 export type StockMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type StockMaxAggregateOutputType = {
   name: string | null
   exchange: string | null
   isActive: boolean | null
+  createdAt: Date | null
 }
 
 export type StockCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type StockCountAggregateOutputType = {
   name: number
   exchange: number
   isActive: number
+  createdAt: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type StockMinAggregateInputType = {
   name?: true
   exchange?: true
   isActive?: true
+  createdAt?: true
 }
 
 export type StockMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type StockMaxAggregateInputType = {
   name?: true
   exchange?: true
   isActive?: true
+  createdAt?: true
 }
 
 export type StockCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type StockCountAggregateInputType = {
   name?: true
   exchange?: true
   isActive?: true
+  createdAt?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type StockGroupByOutputType = {
   name: string
   exchange: string
   isActive: boolean
+  createdAt: Date
   _count: StockCountAggregateOutputType | null
   _min: StockMinAggregateOutputType | null
   _max: StockMaxAggregateOutputType | null
@@ -182,8 +189,10 @@ export type StockWhereInput = {
   name?: Prisma.StringFilter<"Stock"> | string
   exchange?: Prisma.StringFilter<"Stock"> | string
   isActive?: Prisma.BoolFilter<"Stock"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Stock"> | Date | string
   orders?: Prisma.OrderListRelationFilter
   trades?: Prisma.TradeListRelationFilter
+  priceHistory?: Prisma.PriceHistoryListRelationFilter
 }
 
 export type StockOrderByWithRelationInput = {
@@ -192,8 +201,10 @@ export type StockOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   orders?: Prisma.OrderOrderByRelationAggregateInput
   trades?: Prisma.TradeOrderByRelationAggregateInput
+  priceHistory?: Prisma.PriceHistoryOrderByRelationAggregateInput
 }
 
 export type StockWhereUniqueInput = Prisma.AtLeast<{
@@ -205,8 +216,10 @@ export type StockWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Stock"> | string
   exchange?: Prisma.StringFilter<"Stock"> | string
   isActive?: Prisma.BoolFilter<"Stock"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Stock"> | Date | string
   orders?: Prisma.OrderListRelationFilter
   trades?: Prisma.TradeListRelationFilter
+  priceHistory?: Prisma.PriceHistoryListRelationFilter
 }, "id" | "symbol">
 
 export type StockOrderByWithAggregationInput = {
@@ -215,6 +228,7 @@ export type StockOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   _count?: Prisma.StockCountOrderByAggregateInput
   _max?: Prisma.StockMaxOrderByAggregateInput
   _min?: Prisma.StockMinOrderByAggregateInput
@@ -229,6 +243,7 @@ export type StockScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   exchange?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   isActive?: Prisma.BoolWithAggregatesFilter<"Stock"> | boolean
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Stock"> | Date | string
 }
 
 export type StockCreateInput = {
@@ -237,8 +252,10 @@ export type StockCreateInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateInput = {
@@ -247,8 +264,10 @@ export type StockUncheckedCreateInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockUpdateInput = {
@@ -257,8 +276,10 @@ export type StockUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateInput = {
@@ -267,8 +288,10 @@ export type StockUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateManyInput = {
@@ -277,6 +300,7 @@ export type StockCreateManyInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
 }
 
 export type StockUpdateManyMutationInput = {
@@ -285,6 +309,7 @@ export type StockUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StockUncheckedUpdateManyInput = {
@@ -293,6 +318,7 @@ export type StockUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StockCountOrderByAggregateInput = {
@@ -301,6 +327,7 @@ export type StockCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type StockMaxOrderByAggregateInput = {
@@ -309,6 +336,7 @@ export type StockMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type StockMinOrderByAggregateInput = {
@@ -317,6 +345,7 @@ export type StockMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type StockScalarRelationFilter = {
@@ -356,13 +385,29 @@ export type StockUpdateOneRequiredWithoutTradesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutTradesInput, Prisma.StockUpdateWithoutTradesInput>, Prisma.StockUncheckedUpdateWithoutTradesInput>
 }
 
+export type StockCreateNestedOneWithoutPriceHistoryInput = {
+  create?: Prisma.XOR<Prisma.StockCreateWithoutPriceHistoryInput, Prisma.StockUncheckedCreateWithoutPriceHistoryInput>
+  connectOrCreate?: Prisma.StockCreateOrConnectWithoutPriceHistoryInput
+  connect?: Prisma.StockWhereUniqueInput
+}
+
+export type StockUpdateOneRequiredWithoutPriceHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.StockCreateWithoutPriceHistoryInput, Prisma.StockUncheckedCreateWithoutPriceHistoryInput>
+  connectOrCreate?: Prisma.StockCreateOrConnectWithoutPriceHistoryInput
+  upsert?: Prisma.StockUpsertWithoutPriceHistoryInput
+  connect?: Prisma.StockWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutPriceHistoryInput, Prisma.StockUpdateWithoutPriceHistoryInput>, Prisma.StockUncheckedUpdateWithoutPriceHistoryInput>
+}
+
 export type StockCreateWithoutOrdersInput = {
   id?: string
   symbol: string
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutOrdersInput = {
@@ -371,7 +416,9 @@ export type StockUncheckedCreateWithoutOrdersInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutOrdersInput = {
@@ -396,7 +443,9 @@ export type StockUpdateWithoutOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutOrdersInput = {
@@ -405,7 +454,9 @@ export type StockUncheckedUpdateWithoutOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateWithoutTradesInput = {
@@ -414,7 +465,9 @@ export type StockCreateWithoutTradesInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutTradesInput = {
@@ -423,7 +476,9 @@ export type StockUncheckedCreateWithoutTradesInput = {
   name: string
   exchange: string
   isActive?: boolean
+  createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutTradesInput = {
@@ -448,7 +503,9 @@ export type StockUpdateWithoutTradesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutTradesInput = {
@@ -457,7 +514,69 @@ export type StockUncheckedUpdateWithoutTradesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
+}
+
+export type StockCreateWithoutPriceHistoryInput = {
+  id?: string
+  symbol: string
+  name: string
+  exchange: string
+  isActive?: boolean
+  createdAt?: Date | string
+  orders?: Prisma.OrderCreateNestedManyWithoutStockInput
+  trades?: Prisma.TradeCreateNestedManyWithoutStockInput
+}
+
+export type StockUncheckedCreateWithoutPriceHistoryInput = {
+  id?: string
+  symbol: string
+  name: string
+  exchange: string
+  isActive?: boolean
+  createdAt?: Date | string
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
+  trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
+}
+
+export type StockCreateOrConnectWithoutPriceHistoryInput = {
+  where: Prisma.StockWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockCreateWithoutPriceHistoryInput, Prisma.StockUncheckedCreateWithoutPriceHistoryInput>
+}
+
+export type StockUpsertWithoutPriceHistoryInput = {
+  update: Prisma.XOR<Prisma.StockUpdateWithoutPriceHistoryInput, Prisma.StockUncheckedUpdateWithoutPriceHistoryInput>
+  create: Prisma.XOR<Prisma.StockCreateWithoutPriceHistoryInput, Prisma.StockUncheckedCreateWithoutPriceHistoryInput>
+  where?: Prisma.StockWhereInput
+}
+
+export type StockUpdateToOneWithWhereWithoutPriceHistoryInput = {
+  where?: Prisma.StockWhereInput
+  data: Prisma.XOR<Prisma.StockUpdateWithoutPriceHistoryInput, Prisma.StockUncheckedUpdateWithoutPriceHistoryInput>
+}
+
+export type StockUpdateWithoutPriceHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
+  trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
+}
+
+export type StockUncheckedUpdateWithoutPriceHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
+  trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
 }
 
 
@@ -468,11 +587,13 @@ export type StockUncheckedUpdateWithoutTradesInput = {
 export type StockCountOutputType = {
   orders: number
   trades: number
+  priceHistory: number
 }
 
 export type StockCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   orders?: boolean | StockCountOutputTypeCountOrdersArgs
   trades?: boolean | StockCountOutputTypeCountTradesArgs
+  priceHistory?: boolean | StockCountOutputTypeCountPriceHistoryArgs
 }
 
 /**
@@ -499,6 +620,13 @@ export type StockCountOutputTypeCountTradesArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.TradeWhereInput
 }
 
+/**
+ * StockCountOutputType without action
+ */
+export type StockCountOutputTypeCountPriceHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PriceHistoryWhereInput
+}
+
 
 export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -506,8 +634,10 @@ export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   name?: boolean
   exchange?: boolean
   isActive?: boolean
+  createdAt?: boolean
   orders?: boolean | Prisma.Stock$ordersArgs<ExtArgs>
   trades?: boolean | Prisma.Stock$tradesArgs<ExtArgs>
+  priceHistory?: boolean | Prisma.Stock$priceHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.StockCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stock"]>
 
@@ -517,6 +647,7 @@ export type StockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   exchange?: boolean
   isActive?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["stock"]>
 
 export type StockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -525,6 +656,7 @@ export type StockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   exchange?: boolean
   isActive?: boolean
+  createdAt?: boolean
 }, ExtArgs["result"]["stock"]>
 
 export type StockSelectScalar = {
@@ -533,12 +665,14 @@ export type StockSelectScalar = {
   name?: boolean
   exchange?: boolean
   isActive?: boolean
+  createdAt?: boolean
 }
 
-export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "name" | "exchange" | "isActive", ExtArgs["result"]["stock"]>
+export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "name" | "exchange" | "isActive" | "createdAt", ExtArgs["result"]["stock"]>
 export type StockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   orders?: boolean | Prisma.Stock$ordersArgs<ExtArgs>
   trades?: boolean | Prisma.Stock$tradesArgs<ExtArgs>
+  priceHistory?: boolean | Prisma.Stock$priceHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.StockCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StockIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -549,6 +683,7 @@ export type $StockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     orders: Prisma.$OrderPayload<ExtArgs>[]
     trades: Prisma.$TradePayload<ExtArgs>[]
+    priceHistory: Prisma.$PriceHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -556,6 +691,7 @@ export type $StockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     name: string
     exchange: string
     isActive: boolean
+    createdAt: Date
   }, ExtArgs["result"]["stock"]>
   composites: {}
 }
@@ -952,6 +1088,7 @@ export interface Prisma__StockClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   orders<T extends Prisma.Stock$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   trades<T extends Prisma.Stock$tradesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$tradesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  priceHistory<T extends Prisma.Stock$priceHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$priceHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PriceHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -986,6 +1123,7 @@ export interface StockFieldRefs {
   readonly name: Prisma.FieldRef<"Stock", 'String'>
   readonly exchange: Prisma.FieldRef<"Stock", 'String'>
   readonly isActive: Prisma.FieldRef<"Stock", 'Boolean'>
+  readonly createdAt: Prisma.FieldRef<"Stock", 'DateTime'>
 }
     
 
@@ -1419,6 +1557,30 @@ export type Stock$tradesArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.TradeScalarFieldEnum | Prisma.TradeScalarFieldEnum[]
+}
+
+/**
+ * Stock.priceHistory
+ */
+export type Stock$priceHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PriceHistory
+   */
+  select?: Prisma.PriceHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PriceHistory
+   */
+  omit?: Prisma.PriceHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PriceHistoryInclude<ExtArgs> | null
+  where?: Prisma.PriceHistoryWhereInput
+  orderBy?: Prisma.PriceHistoryOrderByWithRelationInput | Prisma.PriceHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.PriceHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PriceHistoryScalarFieldEnum | Prisma.PriceHistoryScalarFieldEnum[]
 }
 
 /**

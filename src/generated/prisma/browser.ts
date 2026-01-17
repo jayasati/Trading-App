@@ -47,3 +47,8 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type Trade = Prisma.TradeModel
+/**
+ * Model PriceHistory
+ * 
+ */
+export type PriceHistory = Prisma.PriceHistoryModel
