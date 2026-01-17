@@ -1,0 +1,61 @@
+import { PassportStrategy } from '@nestjs/passport';
+
+Strategy → JWT verification logic
+ExtractJwt → tells Passport where to find the token
+
+-------------------------------------------------------------------------
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+Strategy → JWT verification logic
+ExtractJwt → tells Passport where to find the token
+-------------------------------------------------------------------------
+super({
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: secret,
+});
+
+This is the most important line.
+It tells Passport:
+📍 Where to find the token--->Authorization: Bearer <accessToken>
+
+🔐 How to verify it (secret key)
+
+Passport now knows:
+✔ How to extract JWT
+✔ How to verify signature
+✔ How to validate expir
+
+-------------------------------------------------------------------------
+Request flow:
+
+Client sends request with access token
+
+AuthGuard('jwt') runs
+
+Passport uses JwtStrategy
+
+Token extracted from header
+
+Signature + expiry verified
+
+validate() runs
+
+req.user is populated
+
+Controller executes
+
+If anything fails → 401 Unauthorized
+-------------------------------------------------------------------------
+This enables:
+
+Secure order placement
+Role-based guards (ADMIN, TRADER)
+Strategy-level permissions
+API protection for bots
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------

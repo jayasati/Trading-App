@@ -6,16 +6,18 @@ import { SignOptions } from 'jsonwebtoken';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     UsersModule,
+
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const expiresIn =
           config.get<string>('JWT_ACCESS_EXPIRES_IN') as SignOptions['expiresIn'];
-
+          
         return {
           secret: config.get<string>('JWT_ACCESS_SECRET')!,
           signOptions: {
@@ -24,9 +26,10 @@ import { UsersModule } from '../users/users.module';
         };
       },
     }),
+
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService,JwtStrategy],
 
 })
 export class AuthModule {}

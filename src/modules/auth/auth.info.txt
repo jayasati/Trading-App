@@ -1,0 +1,98 @@
+✔ Password hashing with bcrypt
+✔ JWT access token (stateless)
+✔ DB-backed refresh token (revocable)
+✔ Role included in JWT
+✔ Centralized token logic
+
+.
+
+🔁 Full request lifecycle (IMPORTANT)
+1.Login request
+2.Controller receives request
+3.Calls authService.login()
+4.Password validated
+5.Access + refresh tokens generated
+6.Tokens returned to client
+
+
+----------------------------------------
+1️⃣ Access Token
+An access token is a short-lived JWT used to access protected APIs.
+
+In your code
+const accessToken = this.jwtService.sign({
+  sub: userId,
+  email,
+  role,
+});
+
+#Properties
+Stateless (NOT stored in DB)
+Signed using secret key
+Contains user identity & role
+Short expiry (e.g. 15m)
+
+
+#What it does
+Every protected request sends: Authorization: Bearer <accessToken>
+
+#Backend:
+Verifies signature
+Checks expiry
+Extracts userId, role
+
+#Why short-lived?
+
+If stolen:
+Damage window is small
+Automatically expires
+----------------------------------------------------------------------------------
+2️⃣ Refresh Token
+A refresh token is a long-lived random secret used to get a new access token.
+
+#In your code:
+const refreshToken = randomUUID();
+
+#Properties
+NOT a JWT
+Stored in database
+Long expiry (days / weeks)
+Revocable
+
+#What it does
+When access token expires:
+POST /auth/refresh
+Client sends refresh token → backend verifies it → issues new access token.
+
+Why NOT JWT?
+Easier to revoke
+Can track devices
+Can detect reuse (security)
+
+------------------------------------------------------------------------------------
+| Problem                | Solved by     |
+| ---------------------- | ------------- |
+| Fast API auth          | Access Token  |
+| Stateless verification | Access Token  |
+| Long session           | Refresh Token |
+| Logout                 | Refresh Token |
+| Token revocation       | Refresh Token |
+| Multi-device login     | Refresh Token |
+-----------------------------------------------------------------------------------------
+Access Token → short-lived JWT used on every request
+Refresh Token → long-lived secret used to get new access tokens
+issueTokens() → function that creates and manages both
+
+-----------------------------------------------------------------------------------------
+Login
+  ↓
+[ accessToken, refreshToken ]
+        ↓
+Use accessToken for APIs
+        ↓
+Access token expires
+        ↓
+Use refreshToken to get new accessToken
+        ↓
+Logout → refreshToken destroyed
+-----------------------------------------------------------------------------------------
