@@ -4,12 +4,16 @@ import { AppService } from './app.service';
 import { ConfigModule } from '../src/config/config.module'
 import { PrismaModule } from './prisma/prisam.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { StocksModule } from './modules/stocks/stocks.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
     ConfigModule,
     PrismaModule,
     AuthModule,
+    StocksModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
