@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
 import { Cron } from '@nestjs/schedule';
+import { MarketGateway } from './market.gateway';
 
 @Injectable()
 export class MarketService {
@@ -9,6 +10,7 @@ export class MarketService {
     constructor(
         private readonly  prisma :PrismaService,
         private readonly  redis : RedisService,
+        private readonly gateway: MarketGateway,
     ){}
 
     async updatePrice(stockId:string,price:number){
@@ -18,6 +20,7 @@ export class MarketService {
                 price,
             },
         });
+        this.gateway.broadcastPrice(stockId, price);
 
         await this.redis
         .getClient()

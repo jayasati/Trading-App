@@ -8,7 +8,7 @@ import { StocksModule } from './modules/stocks/stocks.module';
 import { UsersModule } from './modules/users/users.module';
 import { MarketModule } from './modules/market/market.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { OrdersModule } from './modules/orders/orders.module';
 @Module({
   imports: [
     ConfigModule,
@@ -18,6 +18,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     UsersModule,
     MarketModule,
     ScheduleModule.forRoot(),
+    OrdersModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
