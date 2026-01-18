@@ -1,0 +1,186 @@
+1️⃣ Why this code exists (BIG PICTURE)
+
+In any trading platform (stocks, crypto, commodities):
+
+Orders don’t magically execute — a matching engine decides
+who trades with whom, at what price, and for how much quantity.
+
+This file is responsible for:
+
+Taking an OPEN order
+
+Looking at the order book
+
+Finding matching opposite orders
+
+Executing trades
+
+Updating order statuses atomically
+
+Without this code:
+❌ Orders would just sit in the database
+❌ No trades would ever happen
+❌ Your app would not be a trading platform
+
+
+-----------------------------------------------------------
+2️⃣ What functionality this service provides
+
+✔ Processes a newly placed order
+✔ Matches BUY ↔ SELL orders
+✔ Handles partial fills
+✔ Creates trade records
+✔ Updates order status correctly
+✔ Ensures DB consistency with transactions
+
+This is core exchange logic.
+
+---------------------------------------------------------------
+#1-processOrder() – entry point --->This is the main function that starts matching.
+
+#2- 
+const order = await this.prisma.order.findUnique({
+where: { id: orderId },
+include: { stock: true },
+});
+    Fetches the order from DB
+    Ensures it exists
+    Gets stock info
+
+#3-const book = this.orderBook.getBook(order.stockId);
+    Fetches the in-memory order book for this stock
+    Contains:
+    buy orders
+    sell orders
+
+#4-
+if (order.side === OrderSide.BUY) {
+  await this.matchBuy(order, book.sell);
+} else {
+  await this.matchSell(order, book.buy);
+}
+    BUY orders match against SELL orders
+    SELL orders match against BUY orders
+    This is the core matching decision.
+
+5️⃣ matchBuy() – matching a BUY order
+private async matchBuy(order, sellOrders)
+
+    Match a BUY order with the best available SELL orders.
+
+6️⃣ matchSell() – matching a SELL order
+private async matchSell(order, buyOrders)
+
+Purpose
+
+Match a SELL order with the highest priced BUY orders.
+
+Sort by highest price first
+buyOrders.sort((a, b) => b.price - a.price);
+
+
+Sellers want the highest price
+
+Matching logic
+
+Same structure as matchBuy, but reversed:
+
+Price check is inverted
+
+Buyer is aggressor
+
+7️⃣ executeTrade() – atomic trade execution 🔐
+private async executeTrade(
+  buyOrder,
+  sellOrder,
+  quantity,
+  price,
+)
+
+Purpose
+
+This is the only place where:
+
+Trades are created
+
+Orders are updated
+
+State becomes permanent
+
+Why $transaction() is critical
+await this.prisma.$transaction([
+
+
+This ensures:
+
+ALL operations succeed, or
+
+NONE of them are applied
+
+No partial trades ❌
+No inconsistent order state ❌
+
+Create trade record
+this.prisma.trade.create({
+  data: {
+    buyOrderId,
+    sellOrderId,
+    stockId,
+    price,
+    quantity,
+  },
+}),
+
+
+This is the trade ledger — immutable history.
+
+Update BUY order
+this.prisma.order.update({
+  data: {
+    filledQty: { increment: quantity },
+    status: FILLED or PARTIALLY_FILLED,
+  },
+}),
+
+
+Increments filled quantity
+
+Updates status correctly
+
+Update SELL order
+
+Same logic as BUY, mirrored.
+
+8️⃣ Why this design is correct (VERY IMPORTANT)
+
+✔ Separates concerns
+✔ Fast matching using memory
+✔ Safe persistence using transactions
+✔ Supports partial fills
+✔ Deterministic behavior
+
+This is exactly how:
+
+Stock exchanges
+
+Crypto exchanges
+
+Paper trading engines
+
+are built (simplified).
+
+9️⃣ What this engine does NOT do (yet)
+
+This is important to understand:
+
+❌ No time priority
+❌ No order cancellation
+❌ No stop orders
+❌ No market orders
+❌ No concurrency control
+
+Those are advanced layers added later.
+
+🔟 One-line summary
+
+This service implements a basic trading matching engine that processes open orders, matches buy and sell orders using price priority, executes trades atomically, and updates order states consistently in both memory and database.
