@@ -1,6 +1,9 @@
 export interface OrderBookEntry {
+  orderId: string;
+  userId: string;
   price: number;
-  quantity: number;
+  remainingQty: number;
+  createdAt: Date;
 }
 
 export class OrderBook {

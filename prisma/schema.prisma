@@ -70,12 +70,17 @@ model RefreshToken {
 
 
 model Wallet {
-  id        String   @id @default(uuid())
-  balance   Decimal  @db.Decimal(18, 2)
+  id            String   @id @default(uuid())
+  balance       Decimal  @db.Decimal(18, 2)
+  lockedBalance Decimal  @db.Decimal(18, 2) @default(0)
+
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
 }
+
+
 
 model Stock {
   id        String   @id @default(uuid())

@@ -16,11 +16,23 @@ export class OrderBookService {
     return book;
   }
 
-  addBuy(stockId: string, price: number, quantity: number) {
-    this.getBook(stockId).buy.push({ price, quantity });
+  addBuy(order) {
+    this.getBook(order.stockId).buy.push({
+      orderId: order.id,
+      userId: order.userId,
+      price: order.price,
+      remainingQty: order.quantity,
+      createdAt: order.createdAt,
+    });
   }
 
-  addSell(stockId: string, price: number, quantity: number) {
-    this.getBook(stockId).sell.push({ price, quantity });
+  addSell(order) {
+    this.getBook(order.stockId).sell.push({
+      orderId: order.id,
+      userId: order.userId,
+      price: order.price,
+      remainingQty: order.quantity,
+      createdAt: order.createdAt,
+    });
   }
 }

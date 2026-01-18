@@ -995,6 +995,7 @@ export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[k
 export const WalletScalarFieldEnum = {
   id: 'id',
   balance: 'balance',
+  lockedBalance: 'lockedBalance',
   userId: 'userId',
   createdAt: 'createdAt'
 } as const
