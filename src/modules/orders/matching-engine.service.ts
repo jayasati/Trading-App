@@ -4,6 +4,7 @@ import { OrderBookService } from './order-book.service';
 import {
   OrderSide,
   OrderStatus,
+  Prisma,
 } from '../../generated/prisma/client';
 import { WalletService } from '../wallet/wallet.service';
 
@@ -16,159 +17,130 @@ export class MatchingEngineService {
   ) {}
 
   async processOrder(orderId: string) {
-    const order = await this.prisma.order.findUnique({
+    let order = await this.prisma.order.findUnique({
       where: { id: orderId },
     });
 
-    if (!order || order.status !== OrderStatus.OPEN) {
-      return;
-    }
+    if (!order || order.status !== OrderStatus.OPEN) return;
 
-    const book = this.orderBook.getBook(order.stockId);
+    const matches =
+      order.side === OrderSide.BUY
+        ? this.orderBook.matchBuy(order)
+        : this.orderBook.matchSell(order);
 
-    if (order.side === OrderSide.BUY) {
-      await this.matchBuy(order, book.sell);
-    } else {
-      await this.matchSell(order, book.buy);
-    }
-  }
+    console.log(`🔥 Processing ${order.side} order ${orderId}, found ${matches.length} matches`);
 
-  // ---------------- BUY MATCHING ----------------
-
-  private async matchBuy(order, sellBook) {
-    // Lowest sell price first, then time
-    sellBook.sort(
-      (a, b) =>
-        a.price - b.price ||
-        a.createdAt.getTime() - b.createdAt.getTime(),
-    );
-
-    for (const sell of sellBook) {
-      if (order.filledQty >= order.quantity) break;
-      if (order.price !== null && sell.price > order.price) break;
-      if (sell.remainingQty <= 0) continue;
-
-      const remainingBuyQty =
-        order.quantity - order.filledQty;
-
-      const tradeQty = Math.min(
-        remainingBuyQty,
-        sell.remainingQty,
-      );
-
-      await this.executeTrade(
-        order.id,
-        sell.orderId,
-        order.stockId,
-        tradeQty,
-        sell.price,
-      );
-
-      sell.remainingQty -= tradeQty;
-    }
-  }
-
-  // ---------------- SELL MATCHING ----------------
-
-  private async matchSell(order, buyBook) {
-    // Highest buy price first, then time
-    buyBook.sort(
-      (a, b) =>
-        b.price - a.price ||
-        a.createdAt.getTime() - b.createdAt.getTime(),
-    );
-
-    for (const buy of buyBook) {
-      if (order.filledQty >= order.quantity) break;
-      if (order.price !== null && buy.price < order.price) break;
-      if (buy.remainingQty <= 0) continue;
-
-      const remainingSellQty =
-        order.quantity - order.filledQty;
-
-      const tradeQty = Math.min(
-        remainingSellQty,
-        buy.remainingQty,
-      );
-
-      await this.executeTrade(
-        buy.orderId,
-        order.id,
-        order.stockId,
-        tradeQty,
-        buy.price,
-      );
-
-      buy.remainingQty -= tradeQty;
-    }
-  }
-
-  // ---------------- TRADE EXECUTION ----------------
-
-  private async executeTrade(
-    buyOrderId: string,
-    sellOrderId: string,
-    stockId: string,
-    quantity: number,
-    price: number,
-  ) {
-    await this.prisma.$transaction(async (tx) => {
-      const buyOrder = await tx.order.findUnique({
-        where: { id: buyOrderId },
+    for (const match of matches) {
+      // Refresh order to get latest filledQty
+      order = await this.prisma.order.findUnique({
+        where: { id: orderId },
       });
 
-      const sellOrder = await tx.order.findUnique({
-        where: { id: sellOrderId },
-      });
+      if (!order || order.filledQty >= order.quantity) break;
 
-      if (!buyOrder || !sellOrder) return;
+      const tradeQty = Math.min(
+        order.quantity - order.filledQty,
+        match.quantity,
+      );
 
-      // 1️ Create trade
-      await tx.trade.create({
+      // Skip if no quantity to trade
+      if (tradeQty <= 0) continue;
+
+      const tradePrice = match.price;
+      const tradeValue = new Prisma.Decimal(tradePrice).mul(tradeQty);
+
+      // Determine buyer and seller
+      const buyerId = order.side === OrderSide.BUY ? order.userId : match.userId;
+      const sellerId = order.side === OrderSide.SELL ? order.userId : match.userId;
+      const buyOrderId = order.side === OrderSide.BUY ? order.id : match.orderId;
+      const sellOrderId = order.side === OrderSide.SELL ? order.id : match.orderId;
+
+      console.log(`💱 Trade: ${tradeQty} @ ${tradePrice}, buyer=${buyerId.slice(0,8)}, seller=${sellerId.slice(0,8)}`);
+
+      // 🧾 CREATE TRADE
+      await this.prisma.trade.create({
         data: {
           buyOrderId,
           sellOrderId,
-          stockId,
-          quantity,
-          price,
+          stockId: order.stockId,
+          price: tradePrice,
+          quantity: tradeQty,
         },
       });
 
-      // 2️ Update BUY order
-      const newBuyFilled =
-        buyOrder.filledQty + quantity;
+      // 📊 UPDATE ORDERS with correct status
+      // Update incoming order
+      const newIncomingFilledQty = order.filledQty + tradeQty;
+      const incomingFullyFilled = newIncomingFilledQty >= order.quantity;
+      
+      console.log(`📊 Incoming order: ${order.filledQty} + ${tradeQty} = ${newIncomingFilledQty} / ${order.quantity}`);
+      console.log(`📊 Incoming fully filled? ${incomingFullyFilled}`);
 
-      await tx.order.update({
-        where: { id: buyOrderId },
+      await this.prisma.order.update({
+        where: { id: order.id },
         data: {
-          filledQty: newBuyFilled,
-          status:
-            newBuyFilled >= buyOrder.quantity
-              ? OrderStatus.FILLED
-              : OrderStatus.PARTIALLY_FILLED,
+          filledQty: newIncomingFilledQty,
+          status: incomingFullyFilled 
+            ? OrderStatus.FILLED 
+            : OrderStatus.PARTIALLY_FILLED,
         },
       });
 
-      // 3️  Update SELL order
-      const newSellFilled =
-        sellOrder.filledQty + quantity;
-
-      await tx.order.update({
-        where: { id: sellOrderId },
-        data: {
-          filledQty: newSellFilled,
-          status:
-            newSellFilled >= sellOrder.quantity
-              ? OrderStatus.FILLED
-              : OrderStatus.PARTIALLY_FILLED,
-        },
+      // Update matched order
+      const matchOrder = await this.prisma.order.findUnique({
+        where: { id: match.orderId },
       });
 
-      // 4️ Release BUY locked funds (executed value)
-      await this.walletService.releaseFunds(
-        buyOrder.userId,
-        quantity * price,
-      );
-    });
+      if (matchOrder) {
+        const newMatchFilledQty = matchOrder.filledQty + tradeQty;
+        const matchFullyFilled = newMatchFilledQty >= matchOrder.quantity;
+        
+        console.log(`📊 Match order: ${matchOrder.filledQty} + ${tradeQty} = ${newMatchFilledQty} / ${matchOrder.quantity}`);
+        console.log(`📊 Match fully filled? ${matchFullyFilled}`);
+
+        const updatedMatchOrder = await this.prisma.order.update({
+          where: { id: match.orderId },
+          data: {
+            filledQty: newMatchFilledQty,
+            status: matchFullyFilled 
+              ? OrderStatus.FILLED 
+              : OrderStatus.PARTIALLY_FILLED,
+          },
+        });
+
+        // 🗑️ CLEANUP ORDER BOOK
+        if (incomingFullyFilled) {
+          this.orderBook.removeFilledOrder(
+            order.stockId,
+            order.id,
+            order.side === OrderSide.BUY ? 'BUY' : 'SELL'
+          );
+          console.log(`🗑️ Removed incoming ${order.side} order from book`);
+        } else {
+          this.orderBook.updateOrder(order.stockId, order.id, newIncomingFilledQty);
+          console.log(`🔄 Updated incoming order filledQty in book: ${newIncomingFilledQty}`);
+        }
+
+        if (matchFullyFilled) {
+          this.orderBook.removeFilledOrder(
+            order.stockId,
+            match.orderId,
+            order.side === OrderSide.BUY ? 'SELL' : 'BUY'
+          );
+          console.log(`🗑️ Removed matched ${order.side === OrderSide.BUY ? 'SELL' : 'BUY'} order from book`);
+        } else {
+          this.orderBook.updateOrder(order.stockId, match.orderId, newMatchFilledQty);
+          console.log(`🔄 Updated match order filledQty in book: ${newMatchFilledQty}`);
+        }
+      }
+
+      // 💰 WALLET SETTLEMENT
+      await this.walletService.consumeLockedFunds(buyerId, tradeValue);
+      await this.walletService.creditBalance(sellerId, tradeValue);
+      
+      console.log(`💰 Wallet updated: buyer locked -${tradeValue}, seller balance +${tradeValue}`);
+    }
+
+    console.log(`✅ Order ${orderId} processing complete`);
   }
 }

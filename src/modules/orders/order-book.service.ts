@@ -1,38 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { OrderBook } from './order-book';
+import { Order } from '../../generated/prisma/client';
 
 @Injectable()
 export class OrderBookService {
   private books = new Map<string, OrderBook>();
 
-  getBook(stockId: string): OrderBook {
-    let book = this.books.get(stockId);
-
-    if (!book) {
-      book = new OrderBook();
-      this.books.set(stockId, book);
+  private getBook(stockId: string): OrderBook {
+    if (!this.books.has(stockId)) {
+      this.books.set(stockId, new OrderBook());
     }
-
-    return book;
+    return this.books.get(stockId)!;
   }
 
-  addBuy(order) {
-    this.getBook(order.stockId).buy.push({
-      orderId: order.id,
-      userId: order.userId,
-      price: order.price,
-      remainingQty: order.quantity,
-      createdAt: order.createdAt,
-    });
+  // ➕ ADD ORDERS
+  addBuy(order: Order) {
+    this.getBook(order.stockId).addBuy(order);
+    const book = this.getBook(order.stockId);
   }
 
-  addSell(order) {
-    this.getBook(order.stockId).sell.push({
-      orderId: order.id,
-      userId: order.userId,
-      price: order.price,
-      remainingQty: order.quantity,
-      createdAt: order.createdAt,
-    });
+  addSell(order: Order) {
+    this.getBook(order.stockId).addSell(order);
+    const book = this.getBook(order.stockId);
+  }
+
+  // 🔍 MATCH ORDERS
+  matchBuy(order: Order) {
+    const book = this.getBook(order.stockId); 
+    const matches = book.matchBuy(order);
+    return matches;
+  }
+
+  matchSell(order: Order) {
+    const book = this.getBook(order.stockId);
+    const matches = book.matchSell(order);
+    return matches;
+  }
+
+  // 🗑️ REMOVE FILLED ORDER
+  removeFilledOrder(stockId: string, orderId: string, side: 'BUY' | 'SELL') {
+    this.getBook(stockId).removeFilledOrders(orderId, side);
+    const book = this.getBook(stockId);
+  }
+
+  // 🔄 UPDATE ORDER
+  updateOrder(stockId: string, orderId: string, filledQty: number) {
+    this.getBook(stockId).updateOrder(orderId, filledQty);
   }
 }

@@ -11,11 +11,6 @@ export class OrdersController {
     private readonly ordersService:OrdersService,
   ) {}
 
-  @Get('book/:stockId')
-  getOrderBook(@Param('stockId') stockId: string) {
-    return this.orderBookService.getBook(stockId);
-  }
-
   @Post()
   placeOrder(@Body() body) {
     return this.ordersService.placeOrder(body);

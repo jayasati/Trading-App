@@ -6,64 +6,53 @@ import { Prisma } from '../../generated/prisma/client';
 export class WalletService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Lock funds for BUY orders
-   */
+  // 🔒 Lock funds when BUY LIMIT order is placed
   async lockFunds(userId: string, amount: Prisma.Decimal) {
     const wallet = await this.prisma.wallet.findUnique({
       where: { userId },
     });
 
-    if (!wallet || wallet.balance.lessThan(amount) ) {
+    if (!wallet || wallet.balance.lt(amount)) {
       throw new BadRequestException('Insufficient balance');
     }
 
     await this.prisma.wallet.update({
       where: { userId },
       data: {
-        balance: { decrement: new Prisma.Decimal(amount) },
-        lockedBalance: { increment: new Prisma.Decimal(amount) },
+        balance: { decrement: amount },
+        lockedBalance: { increment: amount },
       },
     });
   }
 
-  /**
-   * Release unused locked funds (cancel / unfilled)
-   */
-  async releaseFunds(userId: string, amount: number) {
+  // ✅ Consume locked funds when trade executes
+  async consumeLockedFunds(userId: string, amount: Prisma.Decimal) {
     await this.prisma.wallet.update({
       where: { userId },
       data: {
-        balance: { increment: new Prisma.Decimal(amount) },
-        lockedBalance: { decrement: new Prisma.Decimal(amount) },
+        lockedBalance: { decrement: amount },
       },
     });
   }
 
-  /**
-   * Settle executed trade
-   */
-  async settleTrade(
-    buyerId: string,
-    sellerId: string,
-    amount: number,
-  ) {
-    await this.prisma.$transaction([
-      // buyer: remove locked funds
-      this.prisma.wallet.update({
-        where: { userId: buyerId },
-        data: {
-          lockedBalance: { decrement: new Prisma.Decimal(amount) },
-        },
-      }),
+  // 💰 Credit seller after trade
+  async creditBalance(userId: string, amount: Prisma.Decimal) {
+    await this.prisma.wallet.update({
+      where: { userId },
+      data: {
+        balance: { increment: amount },
+      },
+    });
+  }
 
-      // seller: receive money
-      this.prisma.wallet.update({
-        where: { userId: sellerId },
-        data: {
-          balance: { increment: new Prisma.Decimal(amount) },
-        },
-      }),
-    ]);
+  // 🔓 Release unused locked funds (partial fill / cancel)
+  async releaseFunds(userId: string, amount: Prisma.Decimal) {
+    await this.prisma.wallet.update({
+      where: { userId },
+      data: {
+        balance: { increment: amount },
+        lockedBalance: { decrement: amount },
+      },
+    });
   }
 }
