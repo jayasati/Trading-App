@@ -3,16 +3,16 @@ import Redis from 'ioredis';
 
 
 @Injectable()
-export class RedisService implements OnModuleInit{
-    private client :Redis;
+export class RedisService implements OnModuleInit {
+    private client: Redis;
 
     onModuleInit() {
-        this.client=new Redis({
-            host :'localhost',
-            port:6379,
+        this.client = new Redis({
+            host: 'localhost',
+            port: 6379,
         });
     }
-    getClient(){
+    getClient() {
         return this.client;
     }
 }

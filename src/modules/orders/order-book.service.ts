@@ -4,47 +4,28 @@ import { Order } from '../../generated/prisma/client';
 
 @Injectable()
 export class OrderBookService {
-  private books = new Map<string, OrderBook>();
+  private readonly books = new Map<string, OrderBook>();
 
-  private getBook(stockId: string): OrderBook {
-    if (!this.books.has(stockId)) {
-      this.books.set(stockId, new OrderBook());
+  getBook(stockId: string): OrderBook {
+    let book = this.books.get(stockId);
+
+    if (!book) {
+      book = new OrderBook();
+      this.books.set(stockId, book);
     }
-    return this.books.get(stockId)!;
+
+    return book;
   }
 
-  // ➕ ADD ORDERS
-  addBuy(order: Order) {
-    this.getBook(order.stockId).addBuy(order);
-    const book = this.getBook(order.stockId);
+  addOrder(order:Order){
+    const book=this.getBook(order.stockId);
+    order.side==='BUY'?book.addBuy(order):book.addSell(order);
   }
 
-  addSell(order: Order) {
-    this.getBook(order.stockId).addSell(order);
-    const book = this.getBook(order.stockId);
+  removeorder(stockId:string ,orderId:string,side:'BUY'|'SELL'){
+    this.getBook(stockId).remove(orderId,side);
   }
 
-  // 🔍 MATCH ORDERS
-  matchBuy(order: Order) {
-    const book = this.getBook(order.stockId); 
-    const matches = book.matchBuy(order);
-    return matches;
-  }
 
-  matchSell(order: Order) {
-    const book = this.getBook(order.stockId);
-    const matches = book.matchSell(order);
-    return matches;
-  }
 
-  // 🗑️ REMOVE FILLED ORDER
-  removeFilledOrder(stockId: string, orderId: string, side: 'BUY' | 'SELL') {
-    this.getBook(stockId).removeFilledOrders(orderId, side);
-    const book = this.getBook(stockId);
-  }
-
-  // 🔄 UPDATE ORDER
-  updateOrder(stockId: string, orderId: string, filledQty: number) {
-    this.getBook(stockId).updateOrder(orderId, filledQty);
-  }
 }

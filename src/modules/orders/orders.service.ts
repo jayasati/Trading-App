@@ -57,15 +57,10 @@ export class OrdersService {
       where: { id: order.id },
     });
 
-    if (updatedOrder && updatedOrder.type === OrderType.LIMIT) {
-      // Only add to book if there's remaining quantity
-      if (updatedOrder.filledQty < updatedOrder.quantity) {
-        if (updatedOrder.side === OrderSide.BUY) {
-          this.orderBook.addBuy(updatedOrder);
-        } else {
-          this.orderBook.addSell(updatedOrder);
-        }
-      }
+    if (updatedOrder && updatedOrder.type === OrderType.LIMIT  &&
+      updatedOrder.filledQty < updatedOrder.quantity) {
+
+        this.orderBook.addOrder(updatedOrder);
     }
 
     return updatedOrder || order;
