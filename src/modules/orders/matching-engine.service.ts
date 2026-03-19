@@ -25,7 +25,7 @@ export class MatchingEngineService {
     private readonly prisma: PrismaService,
     private readonly orderBookService: OrderBookService,
     private readonly walletService: WalletService,
-  ) { }
+  ) {}
 
   async processOrder(orderId: string) {
     const incomingOrder = await this.prisma.order.findUnique({

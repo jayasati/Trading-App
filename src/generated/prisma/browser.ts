@@ -52,3 +52,8 @@ export type Trade = Prisma.TradeModel
  * 
  */
 export type PriceHistory = Prisma.PriceHistoryModel
+/**
+ * Model Holding
+ * 
+ */
+export type Holding = Prisma.HoldingModel

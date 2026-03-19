@@ -57,7 +57,8 @@ export const ModelName = {
   Stock: 'Stock',
   Order: 'Order',
   Trade: 'Trade',
-  PriceHistory: 'PriceHistory'
+  PriceHistory: 'PriceHistory',
+  Holding: 'Holding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -162,6 +163,16 @@ export const PriceHistoryScalarFieldEnum = {
 } as const
 
 export type PriceHistoryScalarFieldEnum = (typeof PriceHistoryScalarFieldEnum)[keyof typeof PriceHistoryScalarFieldEnum]
+
+
+export const HoldingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stockId: 'stockId',
+  quantity: 'quantity'
+} as const
+
+export type HoldingScalarFieldEnum = (typeof HoldingScalarFieldEnum)[keyof typeof HoldingScalarFieldEnum]
 
 
 export const SortOrder = {

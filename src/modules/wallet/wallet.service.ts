@@ -7,8 +7,11 @@ export class WalletService {
   constructor(private readonly prisma: PrismaService) {}
 
   // 🔒 Lock funds when BUY LIMIT order is placed
-  async lockFunds(userId: string, amount: Prisma.Decimal) {
-    const wallet = await this.prisma.wallet.findUnique({
+  async lockFunds(userId: string,
+     amount: Prisma.Decimal,
+     tx:Prisma.TransactionClient=this.prisma,
+    ) {
+    const wallet = await tx.wallet.findUnique({
       where: { userId },
     });
 
@@ -16,7 +19,7 @@ export class WalletService {
       throw new BadRequestException('Insufficient balance');
     }
 
-    await this.prisma.wallet.update({
+    await tx.wallet.update({
       where: { userId },
       data: {
         balance: { decrement: amount },
@@ -26,8 +29,18 @@ export class WalletService {
   }
 
   // ✅ Consume locked funds when trade executes
-  async consumeLockedFunds(userId: string, amount: Prisma.Decimal) {
-    await this.prisma.wallet.update({
+  async consumeLockedFunds(userId: string,
+     amount: Prisma.Decimal,
+     tx: Prisma.TransactionClient=this.prisma,
+    ) {
+
+    const wallet=await tx.wallet.findUnique({
+      where:{userId},
+    });
+    if(!wallet ||wallet.lockedBalance.lt(amount)){
+      throw new BadRequestException('InSufficient Locked Funds');
+    }
+    await tx.wallet.update({
       where: { userId },
       data: {
         lockedBalance: { decrement: amount },
@@ -36,8 +49,11 @@ export class WalletService {
   }
 
   // 💰 Credit seller after trade
-  async creditBalance(userId: string, amount: Prisma.Decimal) {
-    await this.prisma.wallet.update({
+  async creditBalance(userId: string, 
+    amount: Prisma.Decimal,
+    tx:Prisma.TransactionClient=this.prisma
+  ) {
+    await tx.wallet.update({
       where: { userId },
       data: {
         balance: { increment: amount },
@@ -46,8 +62,22 @@ export class WalletService {
   }
 
   // 🔓 Release unused locked funds (partial fill / cancel)
-  async releaseFunds(userId: string, amount: Prisma.Decimal) {
-    await this.prisma.wallet.update({
+  async releaseFunds(userId: string, 
+    amount: Prisma.Decimal,
+    tx:Prisma.TransactionClient,
+  ) {
+
+    const wallet=await tx.wallet.findUnique({
+      where:{userId},
+    });
+
+    if(!wallet || wallet.lockedBalance.lt(amount)){
+      throw new BadRequestException("invalid locked balance");
+    }
+
+
+
+    await tx.wallet.update({
       where: { userId },
       data: {
         balance: { increment: amount },

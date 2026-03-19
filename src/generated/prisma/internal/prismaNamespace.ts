@@ -390,7 +390,8 @@ export const ModelName = {
   Stock: 'Stock',
   Order: 'Order',
   Trade: 'Trade',
-  PriceHistory: 'PriceHistory'
+  PriceHistory: 'PriceHistory',
+  Holding: 'Holding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "wallet" | "stock" | "order" | "trade" | "priceHistory"
+    modelProps: "user" | "refreshToken" | "wallet" | "stock" | "order" | "trade" | "priceHistory" | "holding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -928,6 +929,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Holding: {
+      payload: Prisma.$HoldingPayload<ExtArgs>
+      fields: Prisma.HoldingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HoldingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HoldingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        findFirst: {
+          args: Prisma.HoldingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HoldingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        findMany: {
+          args: Prisma.HoldingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>[]
+        }
+        create: {
+          args: Prisma.HoldingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        createMany: {
+          args: Prisma.HoldingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HoldingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>[]
+        }
+        delete: {
+          args: Prisma.HoldingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        update: {
+          args: Prisma.HoldingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        deleteMany: {
+          args: Prisma.HoldingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HoldingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HoldingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>[]
+        }
+        upsert: {
+          args: Prisma.HoldingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HoldingPayload>
+        }
+        aggregate: {
+          args: Prisma.HoldingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHolding>
+        }
+        groupBy: {
+          args: Prisma.HoldingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HoldingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HoldingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HoldingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1053,6 +1128,16 @@ export const PriceHistoryScalarFieldEnum = {
 } as const
 
 export type PriceHistoryScalarFieldEnum = (typeof PriceHistoryScalarFieldEnum)[keyof typeof PriceHistoryScalarFieldEnum]
+
+
+export const HoldingScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stockId: 'stockId',
+  quantity: 'quantity'
+} as const
+
+export type HoldingScalarFieldEnum = (typeof HoldingScalarFieldEnum)[keyof typeof HoldingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1333,6 +1418,7 @@ export type GlobalOmitConfig = {
   order?: Prisma.OrderOmit
   trade?: Prisma.TradeOmit
   priceHistory?: Prisma.PriceHistoryOmit
+  holding?: Prisma.HoldingOmit
 }
 
 /* Types for Logging */

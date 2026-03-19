@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client"
-   output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -42,19 +42,20 @@ enum OrderStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String
+  name     String?
 
-  role      Role     @default(USER)
-  status    AccountStatus @default(ACTIVE)
+  role   Role          @default(USER)
+  status AccountStatus @default(ACTIVE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  wallet    Wallet?
-  orders    Order[]
+  wallet        Wallet?
+  orders        Order[]
+  holdings      Holding[]
   refreshTokens RefreshToken[]
 }
 
@@ -67,70 +68,66 @@ model RefreshToken {
   createdAt DateTime @default(now())
 }
 
-
-
 model Wallet {
-  id            String   @id @default(uuid())
-  balance       Decimal  @db.Decimal(18, 2)
-  lockedBalance Decimal  @db.Decimal(18, 2) @default(0)
+  id            String  @id @default(uuid())
+  balance       Decimal @db.Decimal(18, 2)
+  lockedBalance Decimal @default(0) @db.Decimal(18, 2)
 
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
 }
 
-
-
 model Stock {
-  id        String   @id @default(uuid())
-  symbol    String   @unique
-  name      String
-  exchange  String
-  isActive  Boolean  @default(true)
+  id       String  @id @default(uuid())
+  symbol   String  @unique
+  name     String
+  exchange String
+  isActive Boolean @default(true)
 
-  orders    Order[]
-  trades    Trade[]
-  priceHistory  PriceHistory[]
-  createdAt DateTime @default(now())
+  orders       Order[]
+  trades       Trade[]
+  priceHistory PriceHistory[]
+  holdings     Holding[]
+  createdAt    DateTime       @default(now())
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  userId     String
-  stockId    String
+  id      String @id @default(uuid())
+  userId  String
+  stockId String
 
-  type       OrderType
-  side       OrderSide
-  price      Decimal?    @db.Decimal(18, 2)
-  quantity   Int
-  filledQty  Int         @default(0)
+  type      OrderType
+  side      OrderSide
+  price     Decimal?  @db.Decimal(18, 2)
+  quantity  Int
+  filledQty Int       @default(0)
 
-  status     OrderStatus @default(OPEN)
+  status OrderStatus @default(OPEN)
 
-  user       User        @relation(fields: [userId], references: [id])
-  stock      Stock       @relation(fields: [stockId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  stock Stock @relation(fields: [stockId], references: [id])
 
-  buyTrades  Trade[]     @relation("BuyOrder")
-  sellTrades Trade[]     @relation("SellOrder")
+  buyTrades  Trade[] @relation("BuyOrder")
+  sellTrades Trade[] @relation("SellOrder")
 
-  createdAt  DateTime    @default(now())
-
+  createdAt DateTime @default(now())
 }
 
 model Trade {
-  id           String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  buyOrderId   String
-  sellOrderId  String
-  stockId      String
+  buyOrderId  String
+  sellOrderId String
+  stockId     String
 
-  price        Decimal  @db.Decimal(18, 2)
-  quantity     Int
+  price    Decimal @db.Decimal(18, 2)
+  quantity Int
 
-  buyOrder   Order @relation("BuyOrder", fields: [buyOrderId], references: [id])
-  sellOrder  Order @relation("SellOrder", fields: [sellOrderId], references: [id])
-  stock      Stock @relation(fields: [stockId], references: [id])
+  buyOrder  Order @relation("BuyOrder", fields: [buyOrderId], references: [id])
+  sellOrder Order @relation("SellOrder", fields: [sellOrderId], references: [id])
+  stock     Stock @relation(fields: [stockId], references: [id])
 
   createdAt DateTime @default(now())
 }
@@ -142,9 +139,19 @@ model PriceHistory {
   volume    Int?
   timestamp DateTime @default(now())
 
-  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
   @@index([stockId, timestamp])
 }
 
+model Holding {
+  id       String @id @default(uuid())
+  userId   String
+  stockId  String
+  quantity Int
 
+  user  User  @relation(fields: [userId], references: [id])
+  stock Stock @relation(fields: [stockId], references: [id])
+
+  @@unique([userId, stockId])
+}
