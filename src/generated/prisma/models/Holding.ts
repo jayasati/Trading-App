@@ -28,10 +28,12 @@ export type AggregateHolding = {
 
 export type HoldingAvgAggregateOutputType = {
   quantity: number | null
+  lockedQty: number | null
 }
 
 export type HoldingSumAggregateOutputType = {
   quantity: number | null
+  lockedQty: number | null
 }
 
 export type HoldingMinAggregateOutputType = {
@@ -39,6 +41,7 @@ export type HoldingMinAggregateOutputType = {
   userId: string | null
   stockId: string | null
   quantity: number | null
+  lockedQty: number | null
 }
 
 export type HoldingMaxAggregateOutputType = {
@@ -46,6 +49,7 @@ export type HoldingMaxAggregateOutputType = {
   userId: string | null
   stockId: string | null
   quantity: number | null
+  lockedQty: number | null
 }
 
 export type HoldingCountAggregateOutputType = {
@@ -53,16 +57,19 @@ export type HoldingCountAggregateOutputType = {
   userId: number
   stockId: number
   quantity: number
+  lockedQty: number
   _all: number
 }
 
 
 export type HoldingAvgAggregateInputType = {
   quantity?: true
+  lockedQty?: true
 }
 
 export type HoldingSumAggregateInputType = {
   quantity?: true
+  lockedQty?: true
 }
 
 export type HoldingMinAggregateInputType = {
@@ -70,6 +77,7 @@ export type HoldingMinAggregateInputType = {
   userId?: true
   stockId?: true
   quantity?: true
+  lockedQty?: true
 }
 
 export type HoldingMaxAggregateInputType = {
@@ -77,6 +85,7 @@ export type HoldingMaxAggregateInputType = {
   userId?: true
   stockId?: true
   quantity?: true
+  lockedQty?: true
 }
 
 export type HoldingCountAggregateInputType = {
@@ -84,6 +93,7 @@ export type HoldingCountAggregateInputType = {
   userId?: true
   stockId?: true
   quantity?: true
+  lockedQty?: true
   _all?: true
 }
 
@@ -178,6 +188,7 @@ export type HoldingGroupByOutputType = {
   userId: string
   stockId: string
   quantity: number
+  lockedQty: number
   _count: HoldingCountAggregateOutputType | null
   _avg: HoldingAvgAggregateOutputType | null
   _sum: HoldingSumAggregateOutputType | null
@@ -208,6 +219,7 @@ export type HoldingWhereInput = {
   userId?: Prisma.StringFilter<"Holding"> | string
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
+  lockedQty?: Prisma.IntFilter<"Holding"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }
@@ -217,6 +229,7 @@ export type HoldingOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   stock?: Prisma.StockOrderByWithRelationInput
 }
@@ -230,6 +243,7 @@ export type HoldingWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Holding"> | string
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
+  lockedQty?: Prisma.IntFilter<"Holding"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }, "id" | "userId_stockId">
@@ -239,6 +253,7 @@ export type HoldingOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
   _count?: Prisma.HoldingCountOrderByAggregateInput
   _avg?: Prisma.HoldingAvgOrderByAggregateInput
   _max?: Prisma.HoldingMaxOrderByAggregateInput
@@ -254,11 +269,13 @@ export type HoldingScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"Holding"> | string
   stockId?: Prisma.StringWithAggregatesFilter<"Holding"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"Holding"> | number
+  lockedQty?: Prisma.IntWithAggregatesFilter<"Holding"> | number
 }
 
 export type HoldingCreateInput = {
   id?: string
   quantity: number
+  lockedQty?: number
   user: Prisma.UserCreateNestedOneWithoutHoldingsInput
   stock: Prisma.StockCreateNestedOneWithoutHoldingsInput
 }
@@ -268,11 +285,13 @@ export type HoldingUncheckedCreateInput = {
   userId: string
   stockId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutHoldingsNestedInput
   stock?: Prisma.StockUpdateOneRequiredWithoutHoldingsNestedInput
 }
@@ -282,6 +301,7 @@ export type HoldingUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingCreateManyInput = {
@@ -289,11 +309,13 @@ export type HoldingCreateManyInput = {
   userId: string
   stockId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingUncheckedUpdateManyInput = {
@@ -301,6 +323,7 @@ export type HoldingUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingListRelationFilter = {
@@ -323,10 +346,12 @@ export type HoldingCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
 }
 
 export type HoldingAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
 }
 
 export type HoldingMaxOrderByAggregateInput = {
@@ -334,6 +359,7 @@ export type HoldingMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
 }
 
 export type HoldingMinOrderByAggregateInput = {
@@ -341,10 +367,12 @@ export type HoldingMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
 }
 
 export type HoldingSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  lockedQty?: Prisma.SortOrder
 }
 
 export type HoldingCreateNestedManyWithoutUserInput = {
@@ -434,6 +462,7 @@ export type HoldingUncheckedUpdateManyWithoutStockNestedInput = {
 export type HoldingCreateWithoutUserInput = {
   id?: string
   quantity: number
+  lockedQty?: number
   stock: Prisma.StockCreateNestedOneWithoutHoldingsInput
 }
 
@@ -441,6 +470,7 @@ export type HoldingUncheckedCreateWithoutUserInput = {
   id?: string
   stockId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingCreateOrConnectWithoutUserInput = {
@@ -477,11 +507,13 @@ export type HoldingScalarWhereInput = {
   userId?: Prisma.StringFilter<"Holding"> | string
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
+  lockedQty?: Prisma.IntFilter<"Holding"> | number
 }
 
 export type HoldingCreateWithoutStockInput = {
   id?: string
   quantity: number
+  lockedQty?: number
   user: Prisma.UserCreateNestedOneWithoutHoldingsInput
 }
 
@@ -489,6 +521,7 @@ export type HoldingUncheckedCreateWithoutStockInput = {
   id?: string
   userId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingCreateOrConnectWithoutStockInput = {
@@ -521,11 +554,13 @@ export type HoldingCreateManyUserInput = {
   id?: string
   stockId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.StockUpdateOneRequiredWithoutHoldingsNestedInput
 }
 
@@ -533,23 +568,27 @@ export type HoldingUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingCreateManyStockInput = {
   id?: string
   userId: string
   quantity: number
+  lockedQty?: number
 }
 
 export type HoldingUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutHoldingsNestedInput
 }
 
@@ -557,12 +596,14 @@ export type HoldingUncheckedUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type HoldingUncheckedUpdateManyWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -572,6 +613,7 @@ export type HoldingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   userId?: boolean
   stockId?: boolean
   quantity?: boolean
+  lockedQty?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -581,6 +623,7 @@ export type HoldingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   userId?: boolean
   stockId?: boolean
   quantity?: boolean
+  lockedQty?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -590,6 +633,7 @@ export type HoldingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   userId?: boolean
   stockId?: boolean
   quantity?: boolean
+  lockedQty?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -599,9 +643,10 @@ export type HoldingSelectScalar = {
   userId?: boolean
   stockId?: boolean
   quantity?: boolean
+  lockedQty?: boolean
 }
 
-export type HoldingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "quantity", ExtArgs["result"]["holding"]>
+export type HoldingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "quantity" | "lockedQty", ExtArgs["result"]["holding"]>
 export type HoldingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -626,6 +671,7 @@ export type $HoldingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     userId: string
     stockId: string
     quantity: number
+    lockedQty: number
   }, ExtArgs["result"]["holding"]>
   composites: {}
 }
@@ -1055,6 +1101,7 @@ export interface HoldingFieldRefs {
   readonly userId: Prisma.FieldRef<"Holding", 'String'>
   readonly stockId: Prisma.FieldRef<"Holding", 'String'>
   readonly quantity: Prisma.FieldRef<"Holding", 'Int'>
+  readonly lockedQty: Prisma.FieldRef<"Holding", 'Int'>
 }
     
 

@@ -1,18 +1,32 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { OrderBookService } from './order-book.service';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { OrdersService } from './orders.service';
+import { JwtAuthGuard } from '../../common/gaurds/jwt-auth.guard';
+import { GetUser } from '../../common/decorators/get-user.decorator';
+import { CreateOrderDto } from './dto/create-order.dto';
+
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(
-    private readonly orderBookService: OrderBookService,
-    private readonly ordersService:OrdersService,
-  ) {}
+  constructor(private readonly ordersService: OrdersService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  placeOrder(@Body() body) {
-    return this.ordersService.placeOrder(body);
+  placeOrder(
+    @GetUser() user: any,
+    @Body() dto: CreateOrderDto,
+  ) {
+    return this.ordersService.placeOrder({
+      ...dto,
+      userId: user.userId, //  secure
+    });
   }
 }

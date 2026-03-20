@@ -24,13 +24,14 @@ export class MarketService {
 
         await this.redis
         .getClient()
-        .set(`price:${stockId}`,price.toString());
+        .set(`price:${stockId}`,price.toString(),'EX',5);//cache expires in 5 seconds
     }
 
     async getLatestPrice(stockId:string){
         const cached=await this.redis
         .getClient()
-        .get(`price${stockId}`);
+        .get(`price:${stockId}`);
+        console.log("CACHE HIT", cached);
 
         if(cached)return Number(cached);
         const latest =await this.prisma.priceHistory.findFirst({

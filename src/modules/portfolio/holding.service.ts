@@ -60,6 +60,7 @@ export class HoldingsService{
                 where:{id:holding.id},
                 data:{
                     quantity:{decrement:quantity},
+                    lockedQty: { decrement: quantity },
                 }
             });
         }

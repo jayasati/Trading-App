@@ -149,6 +149,7 @@ model Holding {
   userId   String
   stockId  String
   quantity Int
+  lockedQty Int      @default(0)
 
   user  User  @relation(fields: [userId], references: [id])
   stock Stock @relation(fields: [stockId], references: [id])

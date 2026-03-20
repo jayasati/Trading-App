@@ -40,6 +40,11 @@ export class OrderBook {
     }
   }
 
+  clear() {
+    this.buyOrders = [];
+    this.sellOrders = [];
+  }
+
   getBuyOrders(){
     return [...this.buyOrders];
   }

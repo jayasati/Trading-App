@@ -169,7 +169,8 @@ export const HoldingScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   stockId: 'stockId',
-  quantity: 'quantity'
+  quantity: 'quantity',
+  lockedQty: 'lockedQty'
 } as const
 
 export type HoldingScalarFieldEnum = (typeof HoldingScalarFieldEnum)[keyof typeof HoldingScalarFieldEnum]

@@ -5,8 +5,14 @@ import { MatchingEngineService } from './matching-engine.service';
 import { OrdersService } from './orders.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WalletModule } from '../wallet/wallet.module';
+import { MarketModule } from '../market/market.module';
+import { PortfolioModule } from '../portfolio/portfolio.module';
+
 @Module({
-  imports:[WalletModule],
+  imports:[WalletModule,
+      MarketModule,
+      PortfolioModule,
+  ],
   controllers: [OrdersController],
   providers: [
       OrderBookService,

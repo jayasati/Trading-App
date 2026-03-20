@@ -9,6 +9,7 @@ import {
 } from '../../generated/prisma/client';
 
 import { WalletService } from '../wallet/wallet.service';
+import { TradeSettlementService } from '../market/trade-settlement.service';
 
 interface MatchConfig {
   incomingOrder: Order;
@@ -25,6 +26,7 @@ export class MatchingEngineService {
     private readonly prisma: PrismaService,
     private readonly orderBookService: OrderBookService,
     private readonly walletService: WalletService,
+    private readonly tradeSettlementService: TradeSettlementService,
   ) {}
 
   async processOrder(orderId: string) {
@@ -34,7 +36,24 @@ export class MatchingEngineService {
 
     if (!incomingOrder || incomingOrder.status !== OrderStatus.OPEN) return;
 
+    // 🔥 Fetch ALL OPEN orders from DB
+    const openOrders = await this.prisma.order.findMany({
+      where: {
+        stockId: incomingOrder.stockId,
+        status: OrderStatus.OPEN,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // 🔥 Rebuild order book
     const book = this.orderBookService.getBook(incomingOrder.stockId);
+
+    // Clear existing (IMPORTANT)
+    book.clear(); // ⬅️ YOU NEED TO ADD THIS METHOD
+
+    for (const order of openOrders) {
+      this.orderBookService.addOrder(order);
+    }
 
     if (incomingOrder.side === OrderSide.BUY) {
       await this.match({
@@ -100,21 +119,17 @@ export class MatchingEngineService {
       ]);
 
       // 🟢 Create trade record
-      await this.prisma.trade.create({
-        data: {
-          buyOrderId: buyer.id,
-          sellOrderId: seller.id,
-          stockId: incomingOrder.stockId,
-          price: new Prisma.Decimal(tradePrice),
-          quantity: matchQty,
-        },
-      });
+    await this.tradeSettlementService.settleTrade({
+      buyOrderId: buyer.id,
+      sellOrderId: seller.id,
+      buyerId: buyer.userId,
+      sellerId: seller.userId,
+      stockId: incomingOrder.stockId,
+      price: tradePrice,
+      quantity: matchQty,
+    });
 
-      // 🟢 Wallet settlement
-      await Promise.all([
-        this.walletService.consumeLockedFunds(buyer.userId, tradeValue),
-        this.walletService.creditBalance(seller.userId, tradeValue),
-      ]);
+
 
       // 🟢 Finalize matching order if fully filled
       if (updatedMatching.filledQty === updatedMatching.quantity) {
@@ -122,6 +137,13 @@ export class MatchingEngineService {
           where: { id: matchingOrder.id },
           data: { status: OrderStatus.FILLED },
         });
+
+        //  REMOVE FROM ORDER BOOK
+        this.orderBookService.removeorder(
+          matchingOrder.stockId,
+          matchingOrder.id,
+          matchingOrder.side
+        );
       }
 
       incomingOrder = updatedIncoming;
@@ -132,12 +154,19 @@ export class MatchingEngineService {
       incomingOrder.filledQty,
       incomingOrder.quantity
     );
-
     if (newStatus !== OrderStatus.OPEN) {
       await this.prisma.order.update({
         where: { id: incomingOrder.id },
         data: { status: newStatus },
       });
+
+      if (newStatus === OrderStatus.FILLED) {
+        this.orderBookService.removeorder(
+          incomingOrder.stockId,
+          incomingOrder.id,
+          incomingOrder.side
+        );
+      }
     }
   }
 
