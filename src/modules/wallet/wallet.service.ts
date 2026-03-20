@@ -6,6 +6,25 @@ import { Prisma } from '../../generated/prisma/client';
 export class WalletService {
   constructor(private readonly prisma: PrismaService) {}
 
+  //deposit 
+  async deposit(userId: string, amount: number) {
+    if (!amount || amount <= 0) {
+      throw new BadRequestException('Invalid deposit amount');
+    }
+
+    return this.creditBalance(
+      userId,
+      new Prisma.Decimal(amount),
+    );
+  }
+
+  //view wallet balance 
+  async getWallet(userId: string) {
+    return this.prisma.wallet.findUnique({
+      where: { userId },
+    });
+  }
+  
   // 🔒 Lock funds when BUY LIMIT order is placed
   async lockFunds(userId: string,
      amount: Prisma.Decimal,
@@ -74,8 +93,6 @@ export class WalletService {
     if(!wallet || wallet.lockedBalance.lt(amount)){
       throw new BadRequestException("invalid locked balance");
     }
-
-
 
     await tx.wallet.update({
       where: { userId },

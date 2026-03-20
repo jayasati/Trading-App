@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { PrismaClient } from '../src/generated/prisma/client';
+import { Prisma, PrismaClient } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
@@ -13,37 +13,72 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg(pool),
 });
 
-async function main() {
-  const stocks = [
-    { symbol: 'RELIANCE', name: 'Reliance Industries' },
-    { symbol: 'TCS', name: 'Tata Consultancy Services' },
-    { symbol: 'INFY', name: 'Infosys' },
-    { symbol: 'HDFCBANK', name: 'HDFC Bank' },
-    { symbol: 'ICICIBANK', name: 'ICICI Bank' },
-    { symbol: 'SBIN', name: 'State Bank of India' },
-    { symbol: 'ITC', name: 'ITC Ltd' },
-    { symbol: 'LT', name: 'Larsen & Toubro' },
-    { symbol: 'KOTAKBANK', name: 'Kotak Bank' },
-    { symbol: 'AXISBANK', name: 'Axis Bank' },
-  ];
 
-  for (const stock of stocks) {
-    await prisma.stock.create({
-      data: {
-        symbol: stock.symbol,
-        name: stock.name,
-        exchange: 'NSE',
-        isActive: true,
-      },
-    });
+async function main() {
+  console.log('🌱 Seeding user wallets + holdings...');
+
+  // 🔍 Get all users
+  const users = await prisma.user.findMany();
+
+  if (users.length === 0) {
+    throw new Error('No users found. Create users first.');
   }
 
-  console.log('✅ Stocks seeded');
+  // 🔍 Get some stocks
+  const stocks = await prisma.stock.findMany({
+    take: 5, // use first 5 stocks
+  });
+
+  if (stocks.length === 0) {
+    throw new Error('No stocks found. Seed stocks first.');
+  }
+
+  for (const user of users) {
+    console.log(`👉 Seeding for user: ${user.email}`);
+
+    // 💰 WALLET (upsert)
+    await prisma.wallet.upsert({
+      where: { userId: user.id },
+      update: {
+        balance: new Prisma.Decimal(20000),
+        lockedBalance: new Prisma.Decimal(0),
+      },
+      create: {
+        userId: user.id,
+        balance: new Prisma.Decimal(20000),
+        lockedBalance: new Prisma.Decimal(0),
+      },
+    });
+
+    // 📊 HOLDINGS
+    for (let i = 0; i < stocks.length; i++) {
+      const stock = stocks[i];
+
+      await prisma.holding.upsert({
+        where: {
+          userId_stockId: {
+            userId: user.id,
+            stockId: stock.id,
+          },
+        },
+        update: {},
+        create: {
+          userId: user.id,
+          stockId: stock.id,
+          quantity: Math.floor(Math.random() * 50) + 10, // 10–60 shares
+          lockedQty: 0,
+        },
+      });
+    }
+  }
+
+  console.log('✅ User wallets + holdings seeded successfully');
 }
 
 main()
-  .catch(console.error)
+  .catch((e) => {
+    console.error(e);
+  })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
