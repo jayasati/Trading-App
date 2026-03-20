@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateStockDto {
   @IsNotEmpty()
@@ -9,6 +9,18 @@ export class CreateStockDto {
 
   @IsNotEmpty()
   exchange: string;
+
+  @IsOptional()
+  @IsString()
+  yahooSymbol?: string;
+
+  @IsOptional()
+  @IsString()
+  sector?: string;
+
+  @IsOptional()
+  @IsString()
+  industry?: string;
 
   @IsOptional()
   @IsBoolean()
