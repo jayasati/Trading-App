@@ -3,6 +3,7 @@ import {
   Post,
   Body,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -28,5 +29,12 @@ export class OrdersController {
       ...dto,
       userId: user.userId, //  secure
     });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  getOrders(@GetUser() user: any) {
+    return this.ordersService.getUserOrders(user.userId);
   }
 }

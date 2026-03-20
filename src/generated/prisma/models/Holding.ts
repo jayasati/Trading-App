@@ -29,11 +29,13 @@ export type AggregateHolding = {
 export type HoldingAvgAggregateOutputType = {
   quantity: number | null
   lockedQty: number | null
+  avgPrice: runtime.Decimal | null
 }
 
 export type HoldingSumAggregateOutputType = {
   quantity: number | null
   lockedQty: number | null
+  avgPrice: runtime.Decimal | null
 }
 
 export type HoldingMinAggregateOutputType = {
@@ -42,6 +44,8 @@ export type HoldingMinAggregateOutputType = {
   stockId: string | null
   quantity: number | null
   lockedQty: number | null
+  avgPrice: runtime.Decimal | null
+  updatedAt: Date | null
 }
 
 export type HoldingMaxAggregateOutputType = {
@@ -50,6 +54,8 @@ export type HoldingMaxAggregateOutputType = {
   stockId: string | null
   quantity: number | null
   lockedQty: number | null
+  avgPrice: runtime.Decimal | null
+  updatedAt: Date | null
 }
 
 export type HoldingCountAggregateOutputType = {
@@ -58,6 +64,8 @@ export type HoldingCountAggregateOutputType = {
   stockId: number
   quantity: number
   lockedQty: number
+  avgPrice: number
+  updatedAt: number
   _all: number
 }
 
@@ -65,11 +73,13 @@ export type HoldingCountAggregateOutputType = {
 export type HoldingAvgAggregateInputType = {
   quantity?: true
   lockedQty?: true
+  avgPrice?: true
 }
 
 export type HoldingSumAggregateInputType = {
   quantity?: true
   lockedQty?: true
+  avgPrice?: true
 }
 
 export type HoldingMinAggregateInputType = {
@@ -78,6 +88,8 @@ export type HoldingMinAggregateInputType = {
   stockId?: true
   quantity?: true
   lockedQty?: true
+  avgPrice?: true
+  updatedAt?: true
 }
 
 export type HoldingMaxAggregateInputType = {
@@ -86,6 +98,8 @@ export type HoldingMaxAggregateInputType = {
   stockId?: true
   quantity?: true
   lockedQty?: true
+  avgPrice?: true
+  updatedAt?: true
 }
 
 export type HoldingCountAggregateInputType = {
@@ -94,6 +108,8 @@ export type HoldingCountAggregateInputType = {
   stockId?: true
   quantity?: true
   lockedQty?: true
+  avgPrice?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -189,6 +205,8 @@ export type HoldingGroupByOutputType = {
   stockId: string
   quantity: number
   lockedQty: number
+  avgPrice: runtime.Decimal
+  updatedAt: Date
   _count: HoldingCountAggregateOutputType | null
   _avg: HoldingAvgAggregateOutputType | null
   _sum: HoldingSumAggregateOutputType | null
@@ -220,6 +238,8 @@ export type HoldingWhereInput = {
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
   lockedQty?: Prisma.IntFilter<"Holding"> | number
+  avgPrice?: Prisma.DecimalFilter<"Holding"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFilter<"Holding"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }
@@ -230,6 +250,8 @@ export type HoldingOrderByWithRelationInput = {
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   stock?: Prisma.StockOrderByWithRelationInput
 }
@@ -244,6 +266,8 @@ export type HoldingWhereUniqueInput = Prisma.AtLeast<{
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
   lockedQty?: Prisma.IntFilter<"Holding"> | number
+  avgPrice?: Prisma.DecimalFilter<"Holding"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFilter<"Holding"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }, "id" | "userId_stockId">
@@ -254,6 +278,8 @@ export type HoldingOrderByWithAggregationInput = {
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.HoldingCountOrderByAggregateInput
   _avg?: Prisma.HoldingAvgOrderByAggregateInput
   _max?: Prisma.HoldingMaxOrderByAggregateInput
@@ -270,12 +296,16 @@ export type HoldingScalarWhereWithAggregatesInput = {
   stockId?: Prisma.StringWithAggregatesFilter<"Holding"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"Holding"> | number
   lockedQty?: Prisma.IntWithAggregatesFilter<"Holding"> | number
+  avgPrice?: Prisma.DecimalWithAggregatesFilter<"Holding"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Holding"> | Date | string
 }
 
 export type HoldingCreateInput = {
   id?: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutHoldingsInput
   stock: Prisma.StockCreateNestedOneWithoutHoldingsInput
 }
@@ -286,12 +316,16 @@ export type HoldingUncheckedCreateInput = {
   stockId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutHoldingsNestedInput
   stock?: Prisma.StockUpdateOneRequiredWithoutHoldingsNestedInput
 }
@@ -302,6 +336,8 @@ export type HoldingUncheckedUpdateInput = {
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingCreateManyInput = {
@@ -310,12 +346,16 @@ export type HoldingCreateManyInput = {
   stockId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingUncheckedUpdateManyInput = {
@@ -324,6 +364,8 @@ export type HoldingUncheckedUpdateManyInput = {
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingListRelationFilter = {
@@ -347,11 +389,14 @@ export type HoldingCountOrderByAggregateInput = {
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type HoldingAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
 }
 
 export type HoldingMaxOrderByAggregateInput = {
@@ -360,6 +405,8 @@ export type HoldingMaxOrderByAggregateInput = {
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type HoldingMinOrderByAggregateInput = {
@@ -368,11 +415,14 @@ export type HoldingMinOrderByAggregateInput = {
   stockId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type HoldingSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   lockedQty?: Prisma.SortOrder
+  avgPrice?: Prisma.SortOrder
 }
 
 export type HoldingCreateNestedManyWithoutUserInput = {
@@ -463,6 +513,8 @@ export type HoldingCreateWithoutUserInput = {
   id?: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
   stock: Prisma.StockCreateNestedOneWithoutHoldingsInput
 }
 
@@ -471,6 +523,8 @@ export type HoldingUncheckedCreateWithoutUserInput = {
   stockId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingCreateOrConnectWithoutUserInput = {
@@ -508,12 +562,16 @@ export type HoldingScalarWhereInput = {
   stockId?: Prisma.StringFilter<"Holding"> | string
   quantity?: Prisma.IntFilter<"Holding"> | number
   lockedQty?: Prisma.IntFilter<"Holding"> | number
+  avgPrice?: Prisma.DecimalFilter<"Holding"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFilter<"Holding"> | Date | string
 }
 
 export type HoldingCreateWithoutStockInput = {
   id?: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutHoldingsInput
 }
 
@@ -522,6 +580,8 @@ export type HoldingUncheckedCreateWithoutStockInput = {
   userId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingCreateOrConnectWithoutStockInput = {
@@ -555,12 +615,16 @@ export type HoldingCreateManyUserInput = {
   stockId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stock?: Prisma.StockUpdateOneRequiredWithoutHoldingsNestedInput
 }
 
@@ -569,6 +633,8 @@ export type HoldingUncheckedUpdateWithoutUserInput = {
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingUncheckedUpdateManyWithoutUserInput = {
@@ -576,6 +642,8 @@ export type HoldingUncheckedUpdateManyWithoutUserInput = {
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingCreateManyStockInput = {
@@ -583,12 +651,16 @@ export type HoldingCreateManyStockInput = {
   userId: string
   quantity: number
   lockedQty?: number
+  avgPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Date | string
 }
 
 export type HoldingUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutHoldingsNestedInput
 }
 
@@ -597,6 +669,8 @@ export type HoldingUncheckedUpdateWithoutStockInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type HoldingUncheckedUpdateManyWithoutStockInput = {
@@ -604,6 +678,8 @@ export type HoldingUncheckedUpdateManyWithoutStockInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   lockedQty?: Prisma.IntFieldUpdateOperationsInput | number
+  avgPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -614,6 +690,8 @@ export type HoldingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   stockId?: boolean
   quantity?: boolean
   lockedQty?: boolean
+  avgPrice?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -624,6 +702,8 @@ export type HoldingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   stockId?: boolean
   quantity?: boolean
   lockedQty?: boolean
+  avgPrice?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -634,6 +714,8 @@ export type HoldingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   stockId?: boolean
   quantity?: boolean
   lockedQty?: boolean
+  avgPrice?: boolean
+  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["holding"]>
@@ -644,9 +726,11 @@ export type HoldingSelectScalar = {
   stockId?: boolean
   quantity?: boolean
   lockedQty?: boolean
+  avgPrice?: boolean
+  updatedAt?: boolean
 }
 
-export type HoldingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "quantity" | "lockedQty", ExtArgs["result"]["holding"]>
+export type HoldingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "quantity" | "lockedQty" | "avgPrice" | "updatedAt", ExtArgs["result"]["holding"]>
 export type HoldingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -672,6 +756,8 @@ export type $HoldingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     stockId: string
     quantity: number
     lockedQty: number
+    avgPrice: runtime.Decimal
+    updatedAt: Date
   }, ExtArgs["result"]["holding"]>
   composites: {}
 }
@@ -1102,6 +1188,8 @@ export interface HoldingFieldRefs {
   readonly stockId: Prisma.FieldRef<"Holding", 'String'>
   readonly quantity: Prisma.FieldRef<"Holding", 'Int'>
   readonly lockedQty: Prisma.FieldRef<"Holding", 'Int'>
+  readonly avgPrice: Prisma.FieldRef<"Holding", 'Decimal'>
+  readonly updatedAt: Prisma.FieldRef<"Holding", 'DateTime'>
 }
     
 

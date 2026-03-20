@@ -28,19 +28,31 @@ export type AggregatePriceHistory = {
 
 export type PriceHistoryAvgAggregateOutputType = {
   price: runtime.Decimal | null
+  open: runtime.Decimal | null
+  high: runtime.Decimal | null
+  low: runtime.Decimal | null
+  close: runtime.Decimal | null
   volume: number | null
 }
 
 export type PriceHistorySumAggregateOutputType = {
   price: runtime.Decimal | null
-  volume: number | null
+  open: runtime.Decimal | null
+  high: runtime.Decimal | null
+  low: runtime.Decimal | null
+  close: runtime.Decimal | null
+  volume: bigint | null
 }
 
 export type PriceHistoryMinAggregateOutputType = {
   id: string | null
   stockId: string | null
   price: runtime.Decimal | null
-  volume: number | null
+  open: runtime.Decimal | null
+  high: runtime.Decimal | null
+  low: runtime.Decimal | null
+  close: runtime.Decimal | null
+  volume: bigint | null
   timestamp: Date | null
 }
 
@@ -48,7 +60,11 @@ export type PriceHistoryMaxAggregateOutputType = {
   id: string | null
   stockId: string | null
   price: runtime.Decimal | null
-  volume: number | null
+  open: runtime.Decimal | null
+  high: runtime.Decimal | null
+  low: runtime.Decimal | null
+  close: runtime.Decimal | null
+  volume: bigint | null
   timestamp: Date | null
 }
 
@@ -56,6 +72,10 @@ export type PriceHistoryCountAggregateOutputType = {
   id: number
   stockId: number
   price: number
+  open: number
+  high: number
+  low: number
+  close: number
   volume: number
   timestamp: number
   _all: number
@@ -64,11 +84,19 @@ export type PriceHistoryCountAggregateOutputType = {
 
 export type PriceHistoryAvgAggregateInputType = {
   price?: true
+  open?: true
+  high?: true
+  low?: true
+  close?: true
   volume?: true
 }
 
 export type PriceHistorySumAggregateInputType = {
   price?: true
+  open?: true
+  high?: true
+  low?: true
+  close?: true
   volume?: true
 }
 
@@ -76,6 +104,10 @@ export type PriceHistoryMinAggregateInputType = {
   id?: true
   stockId?: true
   price?: true
+  open?: true
+  high?: true
+  low?: true
+  close?: true
   volume?: true
   timestamp?: true
 }
@@ -84,6 +116,10 @@ export type PriceHistoryMaxAggregateInputType = {
   id?: true
   stockId?: true
   price?: true
+  open?: true
+  high?: true
+  low?: true
+  close?: true
   volume?: true
   timestamp?: true
 }
@@ -92,6 +128,10 @@ export type PriceHistoryCountAggregateInputType = {
   id?: true
   stockId?: true
   price?: true
+  open?: true
+  high?: true
+  low?: true
+  close?: true
   volume?: true
   timestamp?: true
   _all?: true
@@ -187,7 +227,11 @@ export type PriceHistoryGroupByOutputType = {
   id: string
   stockId: string
   price: runtime.Decimal
-  volume: number | null
+  open: runtime.Decimal | null
+  high: runtime.Decimal | null
+  low: runtime.Decimal | null
+  close: runtime.Decimal | null
+  volume: bigint | null
   timestamp: Date
   _count: PriceHistoryCountAggregateOutputType | null
   _avg: PriceHistoryAvgAggregateOutputType | null
@@ -218,7 +262,11 @@ export type PriceHistoryWhereInput = {
   id?: Prisma.StringFilter<"PriceHistory"> | string
   stockId?: Prisma.StringFilter<"PriceHistory"> | string
   price?: Prisma.DecimalFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.IntNullableFilter<"PriceHistory"> | number | null
+  open?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.BigIntNullableFilter<"PriceHistory"> | bigint | number | null
   timestamp?: Prisma.DateTimeFilter<"PriceHistory"> | Date | string
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }
@@ -227,6 +275,10 @@ export type PriceHistoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrderInput | Prisma.SortOrder
+  high?: Prisma.SortOrderInput | Prisma.SortOrder
+  low?: Prisma.SortOrderInput | Prisma.SortOrder
+  close?: Prisma.SortOrderInput | Prisma.SortOrder
   volume?: Prisma.SortOrderInput | Prisma.SortOrder
   timestamp?: Prisma.SortOrder
   stock?: Prisma.StockOrderByWithRelationInput
@@ -239,7 +291,11 @@ export type PriceHistoryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PriceHistoryWhereInput | Prisma.PriceHistoryWhereInput[]
   stockId?: Prisma.StringFilter<"PriceHistory"> | string
   price?: Prisma.DecimalFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.IntNullableFilter<"PriceHistory"> | number | null
+  open?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.BigIntNullableFilter<"PriceHistory"> | bigint | number | null
   timestamp?: Prisma.DateTimeFilter<"PriceHistory"> | Date | string
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
 }, "id">
@@ -248,6 +304,10 @@ export type PriceHistoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrderInput | Prisma.SortOrder
+  high?: Prisma.SortOrderInput | Prisma.SortOrder
+  low?: Prisma.SortOrderInput | Prisma.SortOrder
+  close?: Prisma.SortOrderInput | Prisma.SortOrder
   volume?: Prisma.SortOrderInput | Prisma.SortOrder
   timestamp?: Prisma.SortOrder
   _count?: Prisma.PriceHistoryCountOrderByAggregateInput
@@ -264,14 +324,22 @@ export type PriceHistoryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"PriceHistory"> | string
   stockId?: Prisma.StringWithAggregatesFilter<"PriceHistory"> | string
   price?: Prisma.DecimalWithAggregatesFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.IntNullableWithAggregatesFilter<"PriceHistory"> | number | null
+  open?: Prisma.DecimalNullableWithAggregatesFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.DecimalNullableWithAggregatesFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.DecimalNullableWithAggregatesFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.DecimalNullableWithAggregatesFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.BigIntNullableWithAggregatesFilter<"PriceHistory"> | bigint | number | null
   timestamp?: Prisma.DateTimeWithAggregatesFilter<"PriceHistory"> | Date | string
 }
 
 export type PriceHistoryCreateInput = {
   id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
   stock: Prisma.StockCreateNestedOneWithoutPriceHistoryInput
 }
@@ -280,14 +348,22 @@ export type PriceHistoryUncheckedCreateInput = {
   id?: string
   stockId: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
 }
 
 export type PriceHistoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stock?: Prisma.StockUpdateOneRequiredWithoutPriceHistoryNestedInput
 }
@@ -296,7 +372,11 @@ export type PriceHistoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -304,14 +384,22 @@ export type PriceHistoryCreateManyInput = {
   id?: string
   stockId: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
 }
 
 export type PriceHistoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -319,7 +407,11 @@ export type PriceHistoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   stockId?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -337,12 +429,20 @@ export type PriceHistoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrder
+  high?: Prisma.SortOrder
+  low?: Prisma.SortOrder
+  close?: Prisma.SortOrder
   volume?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
 
 export type PriceHistoryAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrder
+  high?: Prisma.SortOrder
+  low?: Prisma.SortOrder
+  close?: Prisma.SortOrder
   volume?: Prisma.SortOrder
 }
 
@@ -350,6 +450,10 @@ export type PriceHistoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrder
+  high?: Prisma.SortOrder
+  low?: Prisma.SortOrder
+  close?: Prisma.SortOrder
   volume?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
@@ -358,12 +462,20 @@ export type PriceHistoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stockId?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrder
+  high?: Prisma.SortOrder
+  low?: Prisma.SortOrder
+  close?: Prisma.SortOrder
   volume?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
 
 export type PriceHistorySumOrderByAggregateInput = {
   price?: Prisma.SortOrder
+  open?: Prisma.SortOrder
+  high?: Prisma.SortOrder
+  low?: Prisma.SortOrder
+  close?: Prisma.SortOrder
   volume?: Prisma.SortOrder
 }
 
@@ -409,25 +521,33 @@ export type PriceHistoryUncheckedUpdateManyWithoutStockNestedInput = {
   deleteMany?: Prisma.PriceHistoryScalarWhereInput | Prisma.PriceHistoryScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type PriceHistoryCreateWithoutStockInput = {
   id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
 }
 
 export type PriceHistoryUncheckedCreateWithoutStockInput = {
   id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
 }
 
@@ -464,35 +584,55 @@ export type PriceHistoryScalarWhereInput = {
   id?: Prisma.StringFilter<"PriceHistory"> | string
   stockId?: Prisma.StringFilter<"PriceHistory"> | string
   price?: Prisma.DecimalFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.IntNullableFilter<"PriceHistory"> | number | null
+  open?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.DecimalNullableFilter<"PriceHistory"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.BigIntNullableFilter<"PriceHistory"> | bigint | number | null
   timestamp?: Prisma.DateTimeFilter<"PriceHistory"> | Date | string
 }
 
 export type PriceHistoryCreateManyStockInput = {
   id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: number | null
+  open?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: bigint | number | null
   timestamp?: Date | string
 }
 
 export type PriceHistoryUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PriceHistoryUncheckedUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PriceHistoryUncheckedUpdateManyWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  volume?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  open?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  high?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  low?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  close?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  volume?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -502,6 +642,10 @@ export type PriceHistorySelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   stockId?: boolean
   price?: boolean
+  open?: boolean
+  high?: boolean
+  low?: boolean
+  close?: boolean
   volume?: boolean
   timestamp?: boolean
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -511,6 +655,10 @@ export type PriceHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   stockId?: boolean
   price?: boolean
+  open?: boolean
+  high?: boolean
+  low?: boolean
+  close?: boolean
   volume?: boolean
   timestamp?: boolean
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -520,6 +668,10 @@ export type PriceHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   stockId?: boolean
   price?: boolean
+  open?: boolean
+  high?: boolean
+  low?: boolean
+  close?: boolean
   volume?: boolean
   timestamp?: boolean
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -529,11 +681,15 @@ export type PriceHistorySelectScalar = {
   id?: boolean
   stockId?: boolean
   price?: boolean
+  open?: boolean
+  high?: boolean
+  low?: boolean
+  close?: boolean
   volume?: boolean
   timestamp?: boolean
 }
 
-export type PriceHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stockId" | "price" | "volume" | "timestamp", ExtArgs["result"]["priceHistory"]>
+export type PriceHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stockId" | "price" | "open" | "high" | "low" | "close" | "volume" | "timestamp", ExtArgs["result"]["priceHistory"]>
 export type PriceHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
 }
@@ -553,7 +709,11 @@ export type $PriceHistoryPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: string
     stockId: string
     price: runtime.Decimal
-    volume: number | null
+    open: runtime.Decimal | null
+    high: runtime.Decimal | null
+    low: runtime.Decimal | null
+    close: runtime.Decimal | null
+    volume: bigint | null
     timestamp: Date
   }, ExtArgs["result"]["priceHistory"]>
   composites: {}
@@ -982,7 +1142,11 @@ export interface PriceHistoryFieldRefs {
   readonly id: Prisma.FieldRef<"PriceHistory", 'String'>
   readonly stockId: Prisma.FieldRef<"PriceHistory", 'String'>
   readonly price: Prisma.FieldRef<"PriceHistory", 'Decimal'>
-  readonly volume: Prisma.FieldRef<"PriceHistory", 'Int'>
+  readonly open: Prisma.FieldRef<"PriceHistory", 'Decimal'>
+  readonly high: Prisma.FieldRef<"PriceHistory", 'Decimal'>
+  readonly low: Prisma.FieldRef<"PriceHistory", 'Decimal'>
+  readonly close: Prisma.FieldRef<"PriceHistory", 'Decimal'>
+  readonly volume: Prisma.FieldRef<"PriceHistory", 'BigInt'>
   readonly timestamp: Prisma.FieldRef<"PriceHistory", 'DateTime'>
 }
     

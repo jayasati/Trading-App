@@ -33,6 +33,7 @@
     "@nestjs/websockets": "^11.1.12",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
@@ -45,7 +46,8 @@
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "yahoo-finance2": "^3.13.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

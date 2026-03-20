@@ -20,15 +20,30 @@ export type StockModel = runtime.Types.Result.DefaultSelection<Prisma.$StockPayl
 
 export type AggregateStock = {
   _count: StockCountAggregateOutputType | null
+  _avg: StockAvgAggregateOutputType | null
+  _sum: StockSumAggregateOutputType | null
   _min: StockMinAggregateOutputType | null
   _max: StockMaxAggregateOutputType | null
+}
+
+export type StockAvgAggregateOutputType = {
+  marketCap: runtime.Decimal | null
+}
+
+export type StockSumAggregateOutputType = {
+  marketCap: runtime.Decimal | null
 }
 
 export type StockMinAggregateOutputType = {
   id: string | null
   symbol: string | null
+  yahooSymbol: string | null
   name: string | null
   exchange: string | null
+  sector: string | null
+  industry: string | null
+  marketCap: runtime.Decimal | null
+  isinCode: string | null
   isActive: boolean | null
   createdAt: Date | null
 }
@@ -36,8 +51,13 @@ export type StockMinAggregateOutputType = {
 export type StockMaxAggregateOutputType = {
   id: string | null
   symbol: string | null
+  yahooSymbol: string | null
   name: string | null
   exchange: string | null
+  sector: string | null
+  industry: string | null
+  marketCap: runtime.Decimal | null
+  isinCode: string | null
   isActive: boolean | null
   createdAt: Date | null
 }
@@ -45,19 +65,37 @@ export type StockMaxAggregateOutputType = {
 export type StockCountAggregateOutputType = {
   id: number
   symbol: number
+  yahooSymbol: number
   name: number
   exchange: number
+  sector: number
+  industry: number
+  marketCap: number
+  isinCode: number
   isActive: number
   createdAt: number
   _all: number
 }
 
 
+export type StockAvgAggregateInputType = {
+  marketCap?: true
+}
+
+export type StockSumAggregateInputType = {
+  marketCap?: true
+}
+
 export type StockMinAggregateInputType = {
   id?: true
   symbol?: true
+  yahooSymbol?: true
   name?: true
   exchange?: true
+  sector?: true
+  industry?: true
+  marketCap?: true
+  isinCode?: true
   isActive?: true
   createdAt?: true
 }
@@ -65,8 +103,13 @@ export type StockMinAggregateInputType = {
 export type StockMaxAggregateInputType = {
   id?: true
   symbol?: true
+  yahooSymbol?: true
   name?: true
   exchange?: true
+  sector?: true
+  industry?: true
+  marketCap?: true
+  isinCode?: true
   isActive?: true
   createdAt?: true
 }
@@ -74,8 +117,13 @@ export type StockMaxAggregateInputType = {
 export type StockCountAggregateInputType = {
   id?: true
   symbol?: true
+  yahooSymbol?: true
   name?: true
   exchange?: true
+  sector?: true
+  industry?: true
+  marketCap?: true
+  isinCode?: true
   isActive?: true
   createdAt?: true
   _all?: true
@@ -119,6 +167,18 @@ export type StockAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: StockAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: StockSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: StockMinAggregateInputType
@@ -149,6 +209,8 @@ export type StockGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: StockCountAggregateInputType | true
+  _avg?: StockAvgAggregateInputType
+  _sum?: StockSumAggregateInputType
   _min?: StockMinAggregateInputType
   _max?: StockMaxAggregateInputType
 }
@@ -156,11 +218,18 @@ export type StockGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type StockGroupByOutputType = {
   id: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector: string | null
+  industry: string | null
+  marketCap: runtime.Decimal | null
+  isinCode: string | null
   isActive: boolean
   createdAt: Date
   _count: StockCountAggregateOutputType | null
+  _avg: StockAvgAggregateOutputType | null
+  _sum: StockSumAggregateOutputType | null
   _min: StockMinAggregateOutputType | null
   _max: StockMaxAggregateOutputType | null
 }
@@ -186,8 +255,13 @@ export type StockWhereInput = {
   NOT?: Prisma.StockWhereInput | Prisma.StockWhereInput[]
   id?: Prisma.StringFilter<"Stock"> | string
   symbol?: Prisma.StringFilter<"Stock"> | string
+  yahooSymbol?: Prisma.StringFilter<"Stock"> | string
   name?: Prisma.StringFilter<"Stock"> | string
   exchange?: Prisma.StringFilter<"Stock"> | string
+  sector?: Prisma.StringNullableFilter<"Stock"> | string | null
+  industry?: Prisma.StringNullableFilter<"Stock"> | string | null
+  marketCap?: Prisma.DecimalNullableFilter<"Stock"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.StringNullableFilter<"Stock"> | string | null
   isActive?: Prisma.BoolFilter<"Stock"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Stock"> | Date | string
   orders?: Prisma.OrderListRelationFilter
@@ -199,8 +273,13 @@ export type StockWhereInput = {
 export type StockOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  yahooSymbol?: Prisma.SortOrder
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
+  sector?: Prisma.SortOrderInput | Prisma.SortOrder
+  industry?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketCap?: Prisma.SortOrderInput | Prisma.SortOrder
+  isinCode?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   orders?: Prisma.OrderOrderByRelationAggregateInput
@@ -212,29 +291,41 @@ export type StockOrderByWithRelationInput = {
 export type StockWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   symbol?: string
+  yahooSymbol?: string
+  isinCode?: string
   AND?: Prisma.StockWhereInput | Prisma.StockWhereInput[]
   OR?: Prisma.StockWhereInput[]
   NOT?: Prisma.StockWhereInput | Prisma.StockWhereInput[]
   name?: Prisma.StringFilter<"Stock"> | string
   exchange?: Prisma.StringFilter<"Stock"> | string
+  sector?: Prisma.StringNullableFilter<"Stock"> | string | null
+  industry?: Prisma.StringNullableFilter<"Stock"> | string | null
+  marketCap?: Prisma.DecimalNullableFilter<"Stock"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   isActive?: Prisma.BoolFilter<"Stock"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Stock"> | Date | string
   orders?: Prisma.OrderListRelationFilter
   trades?: Prisma.TradeListRelationFilter
   priceHistory?: Prisma.PriceHistoryListRelationFilter
   holdings?: Prisma.HoldingListRelationFilter
-}, "id" | "symbol">
+}, "id" | "symbol" | "yahooSymbol" | "isinCode">
 
 export type StockOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  yahooSymbol?: Prisma.SortOrder
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
+  sector?: Prisma.SortOrderInput | Prisma.SortOrder
+  industry?: Prisma.SortOrderInput | Prisma.SortOrder
+  marketCap?: Prisma.SortOrderInput | Prisma.SortOrder
+  isinCode?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.StockCountOrderByAggregateInput
+  _avg?: Prisma.StockAvgOrderByAggregateInput
   _max?: Prisma.StockMaxOrderByAggregateInput
   _min?: Prisma.StockMinOrderByAggregateInput
+  _sum?: Prisma.StockSumOrderByAggregateInput
 }
 
 export type StockScalarWhereWithAggregatesInput = {
@@ -243,8 +334,13 @@ export type StockScalarWhereWithAggregatesInput = {
   NOT?: Prisma.StockScalarWhereWithAggregatesInput | Prisma.StockScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   symbol?: Prisma.StringWithAggregatesFilter<"Stock"> | string
+  yahooSymbol?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   name?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   exchange?: Prisma.StringWithAggregatesFilter<"Stock"> | string
+  sector?: Prisma.StringNullableWithAggregatesFilter<"Stock"> | string | null
+  industry?: Prisma.StringNullableWithAggregatesFilter<"Stock"> | string | null
+  marketCap?: Prisma.DecimalNullableWithAggregatesFilter<"Stock"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.StringNullableWithAggregatesFilter<"Stock"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Stock"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Stock"> | Date | string
 }
@@ -252,8 +348,13 @@ export type StockScalarWhereWithAggregatesInput = {
 export type StockCreateInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
@@ -265,8 +366,13 @@ export type StockCreateInput = {
 export type StockUncheckedCreateInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
@@ -278,8 +384,13 @@ export type StockUncheckedCreateInput = {
 export type StockUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
@@ -291,8 +402,13 @@ export type StockUpdateInput = {
 export type StockUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
@@ -304,8 +420,13 @@ export type StockUncheckedUpdateInput = {
 export type StockCreateManyInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
 }
@@ -313,8 +434,13 @@ export type StockCreateManyInput = {
 export type StockUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -322,8 +448,13 @@ export type StockUpdateManyMutationInput = {
 export type StockUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -331,17 +462,31 @@ export type StockUncheckedUpdateManyInput = {
 export type StockCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  yahooSymbol?: Prisma.SortOrder
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
+  marketCap?: Prisma.SortOrder
+  isinCode?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type StockAvgOrderByAggregateInput = {
+  marketCap?: Prisma.SortOrder
 }
 
 export type StockMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  yahooSymbol?: Prisma.SortOrder
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
+  marketCap?: Prisma.SortOrder
+  isinCode?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -349,15 +494,32 @@ export type StockMaxOrderByAggregateInput = {
 export type StockMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   symbol?: Prisma.SortOrder
+  yahooSymbol?: Prisma.SortOrder
   name?: Prisma.SortOrder
   exchange?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
+  marketCap?: Prisma.SortOrder
+  isinCode?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type StockSumOrderByAggregateInput = {
+  marketCap?: Prisma.SortOrder
 }
 
 export type StockScalarRelationFilter = {
   is?: Prisma.StockWhereInput
   isNot?: Prisma.StockWhereInput
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -423,8 +585,13 @@ export type StockUpdateOneRequiredWithoutHoldingsNestedInput = {
 export type StockCreateWithoutOrdersInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
@@ -435,8 +602,13 @@ export type StockCreateWithoutOrdersInput = {
 export type StockUncheckedCreateWithoutOrdersInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
@@ -463,8 +635,13 @@ export type StockUpdateToOneWithWhereWithoutOrdersInput = {
 export type StockUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
@@ -475,8 +652,13 @@ export type StockUpdateWithoutOrdersInput = {
 export type StockUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
@@ -487,8 +669,13 @@ export type StockUncheckedUpdateWithoutOrdersInput = {
 export type StockCreateWithoutTradesInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
@@ -499,8 +686,13 @@ export type StockCreateWithoutTradesInput = {
 export type StockUncheckedCreateWithoutTradesInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
@@ -527,8 +719,13 @@ export type StockUpdateToOneWithWhereWithoutTradesInput = {
 export type StockUpdateWithoutTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
@@ -539,8 +736,13 @@ export type StockUpdateWithoutTradesInput = {
 export type StockUncheckedUpdateWithoutTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
@@ -551,8 +753,13 @@ export type StockUncheckedUpdateWithoutTradesInput = {
 export type StockCreateWithoutPriceHistoryInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
@@ -563,8 +770,13 @@ export type StockCreateWithoutPriceHistoryInput = {
 export type StockUncheckedCreateWithoutPriceHistoryInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
@@ -591,8 +803,13 @@ export type StockUpdateToOneWithWhereWithoutPriceHistoryInput = {
 export type StockUpdateWithoutPriceHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
@@ -603,8 +820,13 @@ export type StockUpdateWithoutPriceHistoryInput = {
 export type StockUncheckedUpdateWithoutPriceHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
@@ -615,8 +837,13 @@ export type StockUncheckedUpdateWithoutPriceHistoryInput = {
 export type StockCreateWithoutHoldingsInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
@@ -627,8 +854,13 @@ export type StockCreateWithoutHoldingsInput = {
 export type StockUncheckedCreateWithoutHoldingsInput = {
   id?: string
   symbol: string
+  yahooSymbol: string
   name: string
   exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
   isActive?: boolean
   createdAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
@@ -655,8 +887,13 @@ export type StockUpdateToOneWithWhereWithoutHoldingsInput = {
 export type StockUpdateWithoutHoldingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
@@ -667,8 +904,13 @@ export type StockUpdateWithoutHoldingsInput = {
 export type StockUncheckedUpdateWithoutHoldingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
@@ -737,8 +979,13 @@ export type StockCountOutputTypeCountHoldingsArgs<ExtArgs extends runtime.Types.
 export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  yahooSymbol?: boolean
   name?: boolean
   exchange?: boolean
+  sector?: boolean
+  industry?: boolean
+  marketCap?: boolean
+  isinCode?: boolean
   isActive?: boolean
   createdAt?: boolean
   orders?: boolean | Prisma.Stock$ordersArgs<ExtArgs>
@@ -751,8 +998,13 @@ export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type StockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  yahooSymbol?: boolean
   name?: boolean
   exchange?: boolean
+  sector?: boolean
+  industry?: boolean
+  marketCap?: boolean
+  isinCode?: boolean
   isActive?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["stock"]>
@@ -760,8 +1012,13 @@ export type StockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type StockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   symbol?: boolean
+  yahooSymbol?: boolean
   name?: boolean
   exchange?: boolean
+  sector?: boolean
+  industry?: boolean
+  marketCap?: boolean
+  isinCode?: boolean
   isActive?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["stock"]>
@@ -769,13 +1026,18 @@ export type StockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type StockSelectScalar = {
   id?: boolean
   symbol?: boolean
+  yahooSymbol?: boolean
   name?: boolean
   exchange?: boolean
+  sector?: boolean
+  industry?: boolean
+  marketCap?: boolean
+  isinCode?: boolean
   isActive?: boolean
   createdAt?: boolean
 }
 
-export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "name" | "exchange" | "isActive" | "createdAt", ExtArgs["result"]["stock"]>
+export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "symbol" | "yahooSymbol" | "name" | "exchange" | "sector" | "industry" | "marketCap" | "isinCode" | "isActive" | "createdAt", ExtArgs["result"]["stock"]>
 export type StockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   orders?: boolean | Prisma.Stock$ordersArgs<ExtArgs>
   trades?: boolean | Prisma.Stock$tradesArgs<ExtArgs>
@@ -797,8 +1059,13 @@ export type $StockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     symbol: string
+    yahooSymbol: string
     name: string
     exchange: string
+    sector: string | null
+    industry: string | null
+    marketCap: runtime.Decimal | null
+    isinCode: string | null
     isActive: boolean
     createdAt: Date
   }, ExtArgs["result"]["stock"]>
@@ -1230,8 +1497,13 @@ export interface Prisma__StockClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface StockFieldRefs {
   readonly id: Prisma.FieldRef<"Stock", 'String'>
   readonly symbol: Prisma.FieldRef<"Stock", 'String'>
+  readonly yahooSymbol: Prisma.FieldRef<"Stock", 'String'>
   readonly name: Prisma.FieldRef<"Stock", 'String'>
   readonly exchange: Prisma.FieldRef<"Stock", 'String'>
+  readonly sector: Prisma.FieldRef<"Stock", 'String'>
+  readonly industry: Prisma.FieldRef<"Stock", 'String'>
+  readonly marketCap: Prisma.FieldRef<"Stock", 'Decimal'>
+  readonly isinCode: Prisma.FieldRef<"Stock", 'String'>
   readonly isActive: Prisma.FieldRef<"Stock", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Stock", 'DateTime'>
 }

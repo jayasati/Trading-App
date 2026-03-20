@@ -80,17 +80,25 @@ model Wallet {
 }
 
 model Stock {
-  id       String  @id @default(uuid())
-  symbol   String  @unique
-  name     String
-  exchange String
-  isActive Boolean @default(true)
+  id        String  @id @default(uuid())
+  symbol    String  @unique  // NSE symbol e.g. "RELIANCE"
+  yahooSymbol String @unique  // Yahoo Finance symbol e.g. "RELIANCE.NS"
+  name      String
+  exchange  String            // "NSE" or "BSE"
+  sector    String?           // "Energy", "Banking" etc
+  industry  String?
+  marketCap Decimal? @db.Decimal(20, 2)
+  isinCode  String?  @unique
+  isActive  Boolean @default(true)
 
   orders       Order[]
   trades       Trade[]
   priceHistory PriceHistory[]
   holdings     Holding[]
   createdAt    DateTime       @default(now())
+
+  @@index([symbol])
+  @@index([sector])
 }
 
 model Order {
@@ -113,6 +121,9 @@ model Order {
   sellTrades Trade[] @relation("SellOrder")
 
   createdAt DateTime @default(now())
+
+  @@index([userId, status])
+  @@index([stockId, status])
 }
 
 model Trade {
@@ -130,13 +141,24 @@ model Trade {
   stock     Stock @relation(fields: [stockId], references: [id])
 
   createdAt DateTime @default(now())
+
+  @@index([stockId])
 }
 
 model PriceHistory {
   id        String   @id @default(uuid())
   stockId   String
+
+  // Live tick price
   price     Decimal  @db.Decimal(18, 2)
-  volume    Int?
+
+  // OHLCV for charting
+  open      Decimal? @db.Decimal(18, 2)
+  high      Decimal? @db.Decimal(18, 2)
+  low       Decimal? @db.Decimal(18, 2)
+  close     Decimal? @db.Decimal(18, 2)
+  volume    BigInt?
+
   timestamp DateTime @default(now())
 
   stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
@@ -145,14 +167,18 @@ model PriceHistory {
 }
 
 model Holding {
-  id       String @id @default(uuid())
-  userId   String
-  stockId  String
-  quantity Int
-  lockedQty Int      @default(0)
+  id        String  @id @default(uuid())
+  userId    String
+  stockId   String
+  quantity  Int
+  lockedQty Int     @default(0)
+  avgPrice  Decimal @default(0) @db.Decimal(18, 2)  // weighted average buy price
 
   user  User  @relation(fields: [userId], references: [id])
   stock Stock @relation(fields: [stockId], references: [id])
 
+  updatedAt DateTime @updatedAt
+
   @@unique([userId, stockId])
+  @@index([userId])
 }

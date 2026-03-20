@@ -21,6 +21,15 @@ export class OrdersService {
     private readonly holdingsService: HoldingsService,
   ) {}
 
+    //get user order
+    async getUserOrders(userId: string) {
+      return this.prisma.order.findMany({
+        where: { userId },
+        include: { stock: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
+    
     async placeOrder(data: any) {
       // BUY → lock funds
       if (data.side === OrderSide.BUY) {
@@ -48,7 +57,7 @@ export class OrdersService {
             },
           },
         });
-        
+
         if (!holding) {
           throw new BadRequestException('No holdings found');
         }

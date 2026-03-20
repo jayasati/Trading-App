@@ -116,8 +116,13 @@ export type WalletScalarFieldEnum = (typeof WalletScalarFieldEnum)[keyof typeof 
 export const StockScalarFieldEnum = {
   id: 'id',
   symbol: 'symbol',
+  yahooSymbol: 'yahooSymbol',
   name: 'name',
   exchange: 'exchange',
+  sector: 'sector',
+  industry: 'industry',
+  marketCap: 'marketCap',
+  isinCode: 'isinCode',
   isActive: 'isActive',
   createdAt: 'createdAt'
 } as const
@@ -158,6 +163,10 @@ export const PriceHistoryScalarFieldEnum = {
   id: 'id',
   stockId: 'stockId',
   price: 'price',
+  open: 'open',
+  high: 'high',
+  low: 'low',
+  close: 'close',
   volume: 'volume',
   timestamp: 'timestamp'
 } as const
@@ -170,7 +179,9 @@ export const HoldingScalarFieldEnum = {
   userId: 'userId',
   stockId: 'stockId',
   quantity: 'quantity',
-  lockedQty: 'lockedQty'
+  lockedQty: 'lockedQty',
+  avgPrice: 'avgPrice',
+  updatedAt: 'updatedAt'
 } as const
 
 export type HoldingScalarFieldEnum = (typeof HoldingScalarFieldEnum)[keyof typeof HoldingScalarFieldEnum]
