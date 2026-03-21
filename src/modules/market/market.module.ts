@@ -1,36 +1,28 @@
-// src/modules/market/market.module.ts
 import { forwardRef, Module } from '@nestjs/common';
-import { MarketService } from './market.service';
 import { MarketController } from './market.controller';
-import { MarketGateway } from './market.gateway';
-import { MarketDataService } from './market-data.service';
-import { TradeSettlementService } from './trade-settlement.service';
-import { PrismaModule } from 'src/prisma/prisam.module';
-import { RedisModule } from 'src/common/redis/redis.module';
-import { WalletModule } from '../wallet/wallet.module';
-import { PortfolioModule } from '../portfolio/portfolio.module';
+import { MarketService } from './market.service';
+import { MarketGateway } from './gateways/market.gateway';
+import { MarketDataService } from './services/market-data.service';
+import { MarketCacheService } from './services/market-cache.service';
+import { MarketBroadcastService } from './services/market-broadcast.service';
+import { MarketCronService } from './services/market-cron.service';
+import { RedisModule } from '../../common/redis/redis.module';
 import { PositionsModule } from '../positions/positions.module';
 
 @Module({
   imports: [
-    PrismaModule,
     RedisModule,
-    WalletModule,
-    PortfolioModule,
-    // forwardRef needed because PositionsModule also imports MarketModule
     forwardRef(() => PositionsModule),
   ],
+  controllers: [MarketController],
   providers: [
     MarketService,
     MarketGateway,
     MarketDataService,
-    TradeSettlementService,
+    MarketCacheService,
+    MarketBroadcastService,
+    MarketCronService,
   ],
-  controllers: [MarketController],
-  exports: [
-    MarketService,
-    MarketDataService,
-    TradeSettlementService,
-  ],
+  exports: [MarketService, MarketDataService],
 })
 export class MarketModule {}

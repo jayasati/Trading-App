@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { WalletService } from '../wallet/wallet.service';
-import { HoldingsService } from '../portfolio/holding.service';
+import { HoldingsService } from '../portfolio/holdings/holding.service';
 import { PositionsService } from '../positions/positions.service';
 import { OrderCategory } from '../../generated/prisma/client';
 import { Decimal } from '@prisma/client/runtime/client';

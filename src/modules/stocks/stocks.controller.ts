@@ -10,8 +10,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { StocksService } from './stocks.service';
 import { CreateStockDto } from './dto/create-stock.dto';
-import { JwtAuthGuard } from '../../common/gaurds/jwt-auth.guard';
-import { RoleGaurd } from '../../common/gaurds/roles.guard'
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RoleGaurd } from '../../common/guards/roles.guard'
 import { Roles } from '../../common/decorators/roles.decorator';
 import { get } from 'http';
 

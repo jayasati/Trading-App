@@ -7,7 +7,7 @@ import {
   Prisma, Order,
 } from '../../generated/prisma/client';
 import { WalletService } from '../wallet/wallet.service';
-import { TradeSettlementService } from '../market/trade-settlement.service';
+import { TradeSettlementService } from '../settlement/trade-settlement.service';
 
 interface MatchConfig {
   incomingOrder:  Order;

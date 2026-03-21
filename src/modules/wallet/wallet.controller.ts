@@ -8,7 +8,7 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { WalletService } from './wallet.service';
-import { JwtAuthGuard } from '../../common/gaurds/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
 @ApiTags('Wallet')

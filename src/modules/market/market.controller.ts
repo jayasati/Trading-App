@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { MarketService } from './market.service';
-import { MarketDataService } from './market-data.service';
+import { MarketDataService } from './services/market-data.service';
 
 @ApiTags('Market')
 @Controller('market')

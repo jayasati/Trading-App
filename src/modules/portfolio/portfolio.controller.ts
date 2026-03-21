@@ -6,7 +6,7 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { JwtAuthGuard } from '../../common/gaurds/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 
 @ApiTags('Portfolio')
@@ -14,7 +14,7 @@ import { GetUser } from '../../common/decorators/get-user.decorator';
 export class PortfolioController {
   constructor(private readonly prisma: PrismaService) {}
 
-  // 🔐 Protected route
+  //  Protected route
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()

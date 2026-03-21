@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { HoldingsService } from './holding.service';
-import { PrismaService } from '../../prisma/prisma.service';
+import { HoldingsService } from './holdings/holding.service';
 import { PortfolioController } from './portfolio.controller';
 
 @Module({
-  controllers:[PortfolioController],
-  providers: [HoldingsService, PrismaService],
-  exports: [HoldingsService],
+  controllers: [PortfolioController],
+  providers:   [HoldingsService],   // ← removed PrismaService (it's global)
+  exports:     [HoldingsService],
 })
 export class PortfolioModule {}
