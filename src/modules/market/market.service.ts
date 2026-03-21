@@ -350,18 +350,17 @@ async fetchRealMarketPrices() {
     };
   }
  
-async getStockNews(stockId: string) {
-  const stock = await this.prisma.stock.findUnique({
-    where: { id: stockId },
-  });
+  async getStockNews(stockId: string) {
+    const stock = await this.prisma.stock.findUnique({
+      where: { id: stockId },
+    });
  
-  if (!stock?.yahooSymbol) return [];
+    if (!stock?.yahooSymbol) return [];
  
-  return this.marketData.fetchNews(stock.yahooSymbol);
-}
-
-
-
+    // No sector param needed — RSS feed is inherently ticker-specific
+    return this.marketData.fetchNews(stock.yahooSymbol);
+  }
+  
 // Returns only stocks that don't have a cached quote yet
   private async filterUncached(
     stocks: Array<{ id: string; symbol: string; yahooSymbol: string | null }>
