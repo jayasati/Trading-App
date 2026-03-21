@@ -48,6 +48,7 @@ export type OrderMinAggregateOutputType = {
   quantity: number | null
   filledQty: number | null
   status: $Enums.OrderStatus | null
+  category: $Enums.OrderCategory | null
   createdAt: Date | null
 }
 
@@ -61,6 +62,7 @@ export type OrderMaxAggregateOutputType = {
   quantity: number | null
   filledQty: number | null
   status: $Enums.OrderStatus | null
+  category: $Enums.OrderCategory | null
   createdAt: Date | null
 }
 
@@ -74,6 +76,7 @@ export type OrderCountAggregateOutputType = {
   quantity: number
   filledQty: number
   status: number
+  category: number
   createdAt: number
   _all: number
 }
@@ -101,6 +104,7 @@ export type OrderMinAggregateInputType = {
   quantity?: true
   filledQty?: true
   status?: true
+  category?: true
   createdAt?: true
 }
 
@@ -114,6 +118,7 @@ export type OrderMaxAggregateInputType = {
   quantity?: true
   filledQty?: true
   status?: true
+  category?: true
   createdAt?: true
 }
 
@@ -127,6 +132,7 @@ export type OrderCountAggregateInputType = {
   quantity?: true
   filledQty?: true
   status?: true
+  category?: true
   createdAt?: true
   _all?: true
 }
@@ -227,6 +233,7 @@ export type OrderGroupByOutputType = {
   quantity: number
   filledQty: number
   status: $Enums.OrderStatus
+  category: $Enums.OrderCategory
   createdAt: Date
   _count: OrderCountAggregateOutputType | null
   _avg: OrderAvgAggregateOutputType | null
@@ -263,6 +270,7 @@ export type OrderWhereInput = {
   quantity?: Prisma.IntFilter<"Order"> | number
   filledQty?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFilter<"Order"> | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
@@ -280,6 +288,7 @@ export type OrderOrderByWithRelationInput = {
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   stock?: Prisma.StockOrderByWithRelationInput
@@ -300,6 +309,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   quantity?: Prisma.IntFilter<"Order"> | number
   filledQty?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFilter<"Order"> | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
@@ -317,6 +327,7 @@ export type OrderOrderByWithAggregationInput = {
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
   _avg?: Prisma.OrderAvgOrderByAggregateInput
@@ -338,6 +349,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   quantity?: Prisma.IntWithAggregatesFilter<"Order"> | number
   filledQty?: Prisma.IntWithAggregatesFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryWithAggregatesFilter<"Order"> | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
 }
 
@@ -349,6 +361,7 @@ export type OrderCreateInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   stock: Prisma.StockCreateNestedOneWithoutOrdersInput
@@ -366,6 +379,7 @@ export type OrderUncheckedCreateInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   buyTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutBuyOrderInput
   sellTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutSellOrderInput
@@ -379,6 +393,7 @@ export type OrderUpdateInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   stock?: Prisma.StockUpdateOneRequiredWithoutOrdersNestedInput
@@ -396,6 +411,7 @@ export type OrderUncheckedUpdateInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyTrades?: Prisma.TradeUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellTrades?: Prisma.TradeUncheckedUpdateManyWithoutSellOrderNestedInput
@@ -411,6 +427,7 @@ export type OrderCreateManyInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
 }
 
@@ -422,6 +439,7 @@ export type OrderUpdateManyMutationInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -435,6 +453,7 @@ export type OrderUncheckedUpdateManyInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -458,6 +477,7 @@ export type OrderCountOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -477,6 +497,7 @@ export type OrderMaxOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -490,6 +511,7 @@ export type OrderMinOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   filledQty?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -608,6 +630,10 @@ export type EnumOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.OrderStatus
 }
 
+export type EnumOrderCategoryFieldUpdateOperationsInput = {
+  set?: $Enums.OrderCategory
+}
+
 export type OrderCreateNestedOneWithoutBuyTradesInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutBuyTradesInput, Prisma.OrderUncheckedCreateWithoutBuyTradesInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutBuyTradesInput
@@ -644,6 +670,7 @@ export type OrderCreateWithoutUserInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   stock: Prisma.StockCreateNestedOneWithoutOrdersInput
   buyTrades?: Prisma.TradeCreateNestedManyWithoutBuyOrderInput
@@ -659,6 +686,7 @@ export type OrderUncheckedCreateWithoutUserInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   buyTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutBuyOrderInput
   sellTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutSellOrderInput
@@ -703,6 +731,7 @@ export type OrderScalarWhereInput = {
   quantity?: Prisma.IntFilter<"Order"> | number
   filledQty?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFilter<"Order"> | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
 }
 
@@ -714,6 +743,7 @@ export type OrderCreateWithoutStockInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   buyTrades?: Prisma.TradeCreateNestedManyWithoutBuyOrderInput
@@ -729,6 +759,7 @@ export type OrderUncheckedCreateWithoutStockInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   buyTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutBuyOrderInput
   sellTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutSellOrderInput
@@ -768,6 +799,7 @@ export type OrderCreateWithoutBuyTradesInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   stock: Prisma.StockCreateNestedOneWithoutOrdersInput
@@ -784,6 +816,7 @@ export type OrderUncheckedCreateWithoutBuyTradesInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   sellTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutSellOrderInput
 }
@@ -801,6 +834,7 @@ export type OrderCreateWithoutSellTradesInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   stock: Prisma.StockCreateNestedOneWithoutOrdersInput
@@ -817,6 +851,7 @@ export type OrderUncheckedCreateWithoutSellTradesInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
   buyTrades?: Prisma.TradeUncheckedCreateNestedManyWithoutBuyOrderInput
 }
@@ -845,6 +880,7 @@ export type OrderUpdateWithoutBuyTradesInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   stock?: Prisma.StockUpdateOneRequiredWithoutOrdersNestedInput
@@ -861,6 +897,7 @@ export type OrderUncheckedUpdateWithoutBuyTradesInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sellTrades?: Prisma.TradeUncheckedUpdateManyWithoutSellOrderNestedInput
 }
@@ -884,6 +921,7 @@ export type OrderUpdateWithoutSellTradesInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   stock?: Prisma.StockUpdateOneRequiredWithoutOrdersNestedInput
@@ -900,6 +938,7 @@ export type OrderUncheckedUpdateWithoutSellTradesInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyTrades?: Prisma.TradeUncheckedUpdateManyWithoutBuyOrderNestedInput
 }
@@ -913,6 +952,7 @@ export type OrderCreateManyUserInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
 }
 
@@ -924,6 +964,7 @@ export type OrderUpdateWithoutUserInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stock?: Prisma.StockUpdateOneRequiredWithoutOrdersNestedInput
   buyTrades?: Prisma.TradeUpdateManyWithoutBuyOrderNestedInput
@@ -939,6 +980,7 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyTrades?: Prisma.TradeUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellTrades?: Prisma.TradeUncheckedUpdateManyWithoutSellOrderNestedInput
@@ -953,6 +995,7 @@ export type OrderUncheckedUpdateManyWithoutUserInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -965,6 +1008,7 @@ export type OrderCreateManyStockInput = {
   quantity: number
   filledQty?: number
   status?: $Enums.OrderStatus
+  category?: $Enums.OrderCategory
   createdAt?: Date | string
 }
 
@@ -976,6 +1020,7 @@ export type OrderUpdateWithoutStockInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   buyTrades?: Prisma.TradeUpdateManyWithoutBuyOrderNestedInput
@@ -991,6 +1036,7 @@ export type OrderUncheckedUpdateWithoutStockInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyTrades?: Prisma.TradeUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellTrades?: Prisma.TradeUncheckedUpdateManyWithoutSellOrderNestedInput
@@ -1005,6 +1051,7 @@ export type OrderUncheckedUpdateManyWithoutStockInput = {
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   filledQty?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  category?: Prisma.EnumOrderCategoryFieldUpdateOperationsInput | $Enums.OrderCategory
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1058,6 +1105,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   quantity?: boolean
   filledQty?: boolean
   status?: boolean
+  category?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -1076,6 +1124,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   quantity?: boolean
   filledQty?: boolean
   status?: boolean
+  category?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -1091,6 +1140,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   quantity?: boolean
   filledQty?: boolean
   status?: boolean
+  category?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -1106,10 +1156,11 @@ export type OrderSelectScalar = {
   quantity?: boolean
   filledQty?: boolean
   status?: boolean
+  category?: boolean
   createdAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "type" | "side" | "price" | "quantity" | "filledQty" | "status" | "createdAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "stockId" | "type" | "side" | "price" | "quantity" | "filledQty" | "status" | "category" | "createdAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
@@ -1144,6 +1195,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     quantity: number
     filledQty: number
     status: $Enums.OrderStatus
+    category: $Enums.OrderCategory
     createdAt: Date
   }, ExtArgs["result"]["order"]>
   composites: {}
@@ -1581,6 +1633,7 @@ export interface OrderFieldRefs {
   readonly quantity: Prisma.FieldRef<"Order", 'Int'>
   readonly filledQty: Prisma.FieldRef<"Order", 'Int'>
   readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
+  readonly category: Prisma.FieldRef<"Order", 'OrderCategory'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
 }
     

@@ -10,6 +10,7 @@ import { MarketModule } from './modules/market/market.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OrdersModule } from './modules/orders/orders.module';
 import { WalletModule } from './modules/wallet/wallet.module';
+import { PositionsModule } from './modules/positions/positions.module';
 @Module({
   imports: [
     ConfigModule,
@@ -21,6 +22,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
     ScheduleModule.forRoot(),
     OrdersModule,
     WalletModule,
+    PositionsModule,
 
   ],
   controllers: [AppController],

@@ -4,6 +4,7 @@ import { RedisService } from '../../common/redis/redis.service';
 import { Cron } from '@nestjs/schedule';
 import { MarketGateway } from './market.gateway';
 import { MarketDataService } from './market-data.service';
+import { PositionsService } from '../positions/positions.service';
 
 @Injectable()
 export class MarketService {
@@ -15,7 +16,30 @@ export class MarketService {
     private readonly redis:       RedisService,
     private readonly gateway:     MarketGateway,
     private readonly marketData:  MarketDataService,
+    private readonly positionsService: PositionsService,
   ) {}
+
+  @Cron('20 15 * * 1-5', { timeZone: 'Asia/Kolkata' }) // 3:20 PM IST
+  async squareOffIntradayPositions() {
+    this.logger.log('🔔 3:20 PM — Auto square-off intraday positions');
+    try {
+      const openPositions = await this.positionsService.getAllOpenPositions();
+      if (!openPositions.length) return;
+
+      for (const pos of openPositions) {
+        const quote = await this.marketData.fetchSingleQuote(
+          pos.stock.yahooSymbol ?? `${pos.stock.symbol}.NS`
+        );
+        const price = quote?.price ?? Number(pos.avgBuyPrice);
+        await this.positionsService.autoSquareOff(
+          pos.stockId, pos.userId, pos.quantity, price
+        );
+        this.logger.log(`Squared off ${pos.quantity} × ${pos.stock.symbol} @ ₹${price}`);
+      }
+    } catch (err: any) {
+      this.logger.error(`Square-off failed: ${err.message}`);
+    }
+  }
 
   // ─────────────────────────────────────────────────────────────
   // updatePrice — saves to DB, caches in Redis, broadcasts via WS

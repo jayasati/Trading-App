@@ -268,6 +268,7 @@ export type StockWhereInput = {
   trades?: Prisma.TradeListRelationFilter
   priceHistory?: Prisma.PriceHistoryListRelationFilter
   holdings?: Prisma.HoldingListRelationFilter
+  positions?: Prisma.PositionListRelationFilter
 }
 
 export type StockOrderByWithRelationInput = {
@@ -286,6 +287,7 @@ export type StockOrderByWithRelationInput = {
   trades?: Prisma.TradeOrderByRelationAggregateInput
   priceHistory?: Prisma.PriceHistoryOrderByRelationAggregateInput
   holdings?: Prisma.HoldingOrderByRelationAggregateInput
+  positions?: Prisma.PositionOrderByRelationAggregateInput
 }
 
 export type StockWhereUniqueInput = Prisma.AtLeast<{
@@ -307,6 +309,7 @@ export type StockWhereUniqueInput = Prisma.AtLeast<{
   trades?: Prisma.TradeListRelationFilter
   priceHistory?: Prisma.PriceHistoryListRelationFilter
   holdings?: Prisma.HoldingListRelationFilter
+  positions?: Prisma.PositionListRelationFilter
 }, "id" | "symbol" | "yahooSymbol" | "isinCode">
 
 export type StockOrderByWithAggregationInput = {
@@ -361,6 +364,7 @@ export type StockCreateInput = {
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateInput = {
@@ -379,6 +383,7 @@ export type StockUncheckedCreateInput = {
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingUncheckedCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockUpdateInput = {
@@ -397,6 +402,7 @@ export type StockUpdateInput = {
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateInput = {
@@ -415,6 +421,7 @@ export type StockUncheckedUpdateInput = {
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUncheckedUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateManyInput = {
@@ -582,6 +589,20 @@ export type StockUpdateOneRequiredWithoutHoldingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutHoldingsInput, Prisma.StockUpdateWithoutHoldingsInput>, Prisma.StockUncheckedUpdateWithoutHoldingsInput>
 }
 
+export type StockCreateNestedOneWithoutPositionsInput = {
+  create?: Prisma.XOR<Prisma.StockCreateWithoutPositionsInput, Prisma.StockUncheckedCreateWithoutPositionsInput>
+  connectOrCreate?: Prisma.StockCreateOrConnectWithoutPositionsInput
+  connect?: Prisma.StockWhereUniqueInput
+}
+
+export type StockUpdateOneRequiredWithoutPositionsNestedInput = {
+  create?: Prisma.XOR<Prisma.StockCreateWithoutPositionsInput, Prisma.StockUncheckedCreateWithoutPositionsInput>
+  connectOrCreate?: Prisma.StockCreateOrConnectWithoutPositionsInput
+  upsert?: Prisma.StockUpsertWithoutPositionsInput
+  connect?: Prisma.StockWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutPositionsInput, Prisma.StockUpdateWithoutPositionsInput>, Prisma.StockUncheckedUpdateWithoutPositionsInput>
+}
+
 export type StockCreateWithoutOrdersInput = {
   id?: string
   symbol: string
@@ -597,6 +618,7 @@ export type StockCreateWithoutOrdersInput = {
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutOrdersInput = {
@@ -614,6 +636,7 @@ export type StockUncheckedCreateWithoutOrdersInput = {
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingUncheckedCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutOrdersInput = {
@@ -647,6 +670,7 @@ export type StockUpdateWithoutOrdersInput = {
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutOrdersInput = {
@@ -664,6 +688,7 @@ export type StockUncheckedUpdateWithoutOrdersInput = {
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUncheckedUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateWithoutTradesInput = {
@@ -681,6 +706,7 @@ export type StockCreateWithoutTradesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutTradesInput = {
@@ -698,6 +724,7 @@ export type StockUncheckedCreateWithoutTradesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingUncheckedCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutTradesInput = {
@@ -731,6 +758,7 @@ export type StockUpdateWithoutTradesInput = {
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutTradesInput = {
@@ -748,6 +776,7 @@ export type StockUncheckedUpdateWithoutTradesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUncheckedUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateWithoutPriceHistoryInput = {
@@ -765,6 +794,7 @@ export type StockCreateWithoutPriceHistoryInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutPriceHistoryInput = {
@@ -782,6 +812,7 @@ export type StockUncheckedCreateWithoutPriceHistoryInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
   holdings?: Prisma.HoldingUncheckedCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutPriceHistoryInput = {
@@ -815,6 +846,7 @@ export type StockUpdateWithoutPriceHistoryInput = {
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutPriceHistoryInput = {
@@ -832,6 +864,7 @@ export type StockUncheckedUpdateWithoutPriceHistoryInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
   holdings?: Prisma.HoldingUncheckedUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutStockNestedInput
 }
 
 export type StockCreateWithoutHoldingsInput = {
@@ -849,6 +882,7 @@ export type StockCreateWithoutHoldingsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionCreateNestedManyWithoutStockInput
 }
 
 export type StockUncheckedCreateWithoutHoldingsInput = {
@@ -866,6 +900,7 @@ export type StockUncheckedCreateWithoutHoldingsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
   priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
+  positions?: Prisma.PositionUncheckedCreateNestedManyWithoutStockInput
 }
 
 export type StockCreateOrConnectWithoutHoldingsInput = {
@@ -899,6 +934,7 @@ export type StockUpdateWithoutHoldingsInput = {
   orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUpdateManyWithoutStockNestedInput
 }
 
 export type StockUncheckedUpdateWithoutHoldingsInput = {
@@ -916,6 +952,95 @@ export type StockUncheckedUpdateWithoutHoldingsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
   priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
+  positions?: Prisma.PositionUncheckedUpdateManyWithoutStockNestedInput
+}
+
+export type StockCreateWithoutPositionsInput = {
+  id?: string
+  symbol: string
+  yahooSymbol: string
+  name: string
+  exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  orders?: Prisma.OrderCreateNestedManyWithoutStockInput
+  trades?: Prisma.TradeCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryCreateNestedManyWithoutStockInput
+  holdings?: Prisma.HoldingCreateNestedManyWithoutStockInput
+}
+
+export type StockUncheckedCreateWithoutPositionsInput = {
+  id?: string
+  symbol: string
+  yahooSymbol: string
+  name: string
+  exchange: string
+  sector?: string | null
+  industry?: string | null
+  marketCap?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStockInput
+  trades?: Prisma.TradeUncheckedCreateNestedManyWithoutStockInput
+  priceHistory?: Prisma.PriceHistoryUncheckedCreateNestedManyWithoutStockInput
+  holdings?: Prisma.HoldingUncheckedCreateNestedManyWithoutStockInput
+}
+
+export type StockCreateOrConnectWithoutPositionsInput = {
+  where: Prisma.StockWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockCreateWithoutPositionsInput, Prisma.StockUncheckedCreateWithoutPositionsInput>
+}
+
+export type StockUpsertWithoutPositionsInput = {
+  update: Prisma.XOR<Prisma.StockUpdateWithoutPositionsInput, Prisma.StockUncheckedUpdateWithoutPositionsInput>
+  create: Prisma.XOR<Prisma.StockCreateWithoutPositionsInput, Prisma.StockUncheckedCreateWithoutPositionsInput>
+  where?: Prisma.StockWhereInput
+}
+
+export type StockUpdateToOneWithWhereWithoutPositionsInput = {
+  where?: Prisma.StockWhereInput
+  data: Prisma.XOR<Prisma.StockUpdateWithoutPositionsInput, Prisma.StockUncheckedUpdateWithoutPositionsInput>
+}
+
+export type StockUpdateWithoutPositionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUpdateManyWithoutStockNestedInput
+  trades?: Prisma.TradeUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUpdateManyWithoutStockNestedInput
+  holdings?: Prisma.HoldingUpdateManyWithoutStockNestedInput
+}
+
+export type StockUncheckedUpdateWithoutPositionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  symbol?: Prisma.StringFieldUpdateOperationsInput | string
+  yahooSymbol?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  exchange?: Prisma.StringFieldUpdateOperationsInput | string
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marketCap?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isinCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutStockNestedInput
+  trades?: Prisma.TradeUncheckedUpdateManyWithoutStockNestedInput
+  priceHistory?: Prisma.PriceHistoryUncheckedUpdateManyWithoutStockNestedInput
+  holdings?: Prisma.HoldingUncheckedUpdateManyWithoutStockNestedInput
 }
 
 
@@ -928,6 +1053,7 @@ export type StockCountOutputType = {
   trades: number
   priceHistory: number
   holdings: number
+  positions: number
 }
 
 export type StockCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -935,6 +1061,7 @@ export type StockCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   trades?: boolean | StockCountOutputTypeCountTradesArgs
   priceHistory?: boolean | StockCountOutputTypeCountPriceHistoryArgs
   holdings?: boolean | StockCountOutputTypeCountHoldingsArgs
+  positions?: boolean | StockCountOutputTypeCountPositionsArgs
 }
 
 /**
@@ -975,6 +1102,13 @@ export type StockCountOutputTypeCountHoldingsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.HoldingWhereInput
 }
 
+/**
+ * StockCountOutputType without action
+ */
+export type StockCountOutputTypeCountPositionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PositionWhereInput
+}
+
 
 export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -992,6 +1126,7 @@ export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   trades?: boolean | Prisma.Stock$tradesArgs<ExtArgs>
   priceHistory?: boolean | Prisma.Stock$priceHistoryArgs<ExtArgs>
   holdings?: boolean | Prisma.Stock$holdingsArgs<ExtArgs>
+  positions?: boolean | Prisma.Stock$positionsArgs<ExtArgs>
   _count?: boolean | Prisma.StockCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stock"]>
 
@@ -1043,6 +1178,7 @@ export type StockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   trades?: boolean | Prisma.Stock$tradesArgs<ExtArgs>
   priceHistory?: boolean | Prisma.Stock$priceHistoryArgs<ExtArgs>
   holdings?: boolean | Prisma.Stock$holdingsArgs<ExtArgs>
+  positions?: boolean | Prisma.Stock$positionsArgs<ExtArgs>
   _count?: boolean | Prisma.StockCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StockIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1055,6 +1191,7 @@ export type $StockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     trades: Prisma.$TradePayload<ExtArgs>[]
     priceHistory: Prisma.$PriceHistoryPayload<ExtArgs>[]
     holdings: Prisma.$HoldingPayload<ExtArgs>[]
+    positions: Prisma.$PositionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1466,6 +1603,7 @@ export interface Prisma__StockClient<T, Null = never, ExtArgs extends runtime.Ty
   trades<T extends Prisma.Stock$tradesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$tradesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   priceHistory<T extends Prisma.Stock$priceHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$priceHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PriceHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   holdings<T extends Prisma.Stock$holdingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$holdingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  positions<T extends Prisma.Stock$positionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Stock$positionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PositionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1987,6 +2125,30 @@ export type Stock$holdingsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.HoldingScalarFieldEnum | Prisma.HoldingScalarFieldEnum[]
+}
+
+/**
+ * Stock.positions
+ */
+export type Stock$positionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Position
+   */
+  select?: Prisma.PositionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Position
+   */
+  omit?: Prisma.PositionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PositionInclude<ExtArgs> | null
+  where?: Prisma.PositionWhereInput
+  orderBy?: Prisma.PositionOrderByWithRelationInput | Prisma.PositionOrderByWithRelationInput[]
+  cursor?: Prisma.PositionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PositionScalarFieldEnum | Prisma.PositionScalarFieldEnum[]
 }
 
 /**

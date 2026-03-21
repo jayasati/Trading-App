@@ -57,3 +57,8 @@ export type PriceHistory = Prisma.PriceHistoryModel
  * 
  */
 export type Holding = Prisma.HoldingModel
+/**
+ * Model Position
+ * 
+ */
+export type Position = Prisma.PositionModel

@@ -50,3 +50,20 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const OrderCategory = {
+  DELIVERY: 'DELIVERY',
+  INTRADAY: 'INTRADAY'
+} as const
+
+export type OrderCategory = (typeof OrderCategory)[keyof typeof OrderCategory]
+
+
+export const PositionStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  SQUARED_OFF: 'SQUARED_OFF'
+} as const
+
+export type PositionStatus = (typeof PositionStatus)[keyof typeof PositionStatus]

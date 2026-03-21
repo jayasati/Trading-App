@@ -243,6 +243,13 @@ export type EnumOrderStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus
 }
 
+export type EnumOrderCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.OrderCategory | Prisma.EnumOrderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel> | $Enums.OrderCategory
+}
+
 export type EnumOrderTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>
   in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>
@@ -289,6 +296,16 @@ export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
 }
 
+export type EnumOrderCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.OrderCategory | Prisma.EnumOrderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumOrderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.OrderCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel>
+}
+
 export type BigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -314,6 +331,23 @@ export type BigIntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedBigIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedBigIntNullableFilter<$PrismaModel>
   _max?: Prisma.NestedBigIntNullableFilter<$PrismaModel>
+}
+
+export type EnumPositionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PositionStatus | Prisma.EnumPositionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel> | $Enums.PositionStatus
+}
+
+export type EnumPositionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PositionStatus | Prisma.EnumPositionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPositionStatusWithAggregatesFilter<$PrismaModel> | $Enums.PositionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -547,6 +581,13 @@ export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus
 }
 
+export type NestedEnumOrderCategoryFilter<$PrismaModel = never> = {
+  equals?: $Enums.OrderCategory | Prisma.EnumOrderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel> | $Enums.OrderCategory
+}
+
 export type NestedEnumOrderTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.OrderType | Prisma.EnumOrderTypeFieldRefInput<$PrismaModel>
   in?: $Enums.OrderType[] | Prisma.ListEnumOrderTypeFieldRefInput<$PrismaModel>
@@ -604,6 +645,16 @@ export type NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
 }
 
+export type NestedEnumOrderCategoryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.OrderCategory | Prisma.EnumOrderCategoryFieldRefInput<$PrismaModel>
+  in?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.OrderCategory[] | Prisma.ListEnumOrderCategoryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumOrderCategoryWithAggregatesFilter<$PrismaModel> | $Enums.OrderCategory
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumOrderCategoryFilter<$PrismaModel>
+}
+
 export type NestedBigIntNullableFilter<$PrismaModel = never> = {
   equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel> | null
   in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel> | null
@@ -640,6 +691,23 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumPositionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PositionStatus | Prisma.EnumPositionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel> | $Enums.PositionStatus
+}
+
+export type NestedEnumPositionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PositionStatus | Prisma.EnumPositionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PositionStatus[] | Prisma.ListEnumPositionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPositionStatusWithAggregatesFilter<$PrismaModel> | $Enums.PositionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPositionStatusFilter<$PrismaModel>
 }
 
 

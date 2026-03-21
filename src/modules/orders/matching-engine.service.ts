@@ -1,32 +1,30 @@
+// src/modules/orders/matching-engine.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { OrderBookService } from './order-book.service';
 import {
-  OrderSide,
-  OrderStatus,
-  Prisma,
-  Order,
+  OrderSide, OrderStatus, OrderCategory,
+  Prisma, Order,
 } from '../../generated/prisma/client';
-
 import { WalletService } from '../wallet/wallet.service';
 import { TradeSettlementService } from '../market/trade-settlement.service';
 
 interface MatchConfig {
-  incomingOrder: Order;
+  incomingOrder:  Order;
   matchingOrders: Order[];
-  getTradePrice: (incoming: Order, matching: Order) => number;
-  shouldMatch: (incoming: Order, matching: Order) => boolean;
-  getBuyer: (incoming: Order, matching: Order) => { id: string; userId: string };
-  getSeller: (incoming: Order, matching: Order) => { id: string; userId: string };
+  getTradePrice:  (incoming: Order, matching: Order) => number;
+  shouldMatch:    (incoming: Order, matching: Order) => boolean;
+  getBuyer:       (incoming: Order, matching: Order) => { id: string; userId: string };
+  getSeller:      (incoming: Order, matching: Order) => { id: string; userId: string };
 }
 
 @Injectable()
 export class MatchingEngineService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly orderBookService: OrderBookService,
-    private readonly walletService: WalletService,
-    private readonly tradeSettlementService: TradeSettlementService,
+    private readonly prisma:             PrismaService,
+    private readonly orderBookService:   OrderBookService,
+    private readonly walletService:      WalletService,
+    private readonly tradeSettlement:    TradeSettlementService,
   ) {}
 
   async processOrder(orderId: string) {
@@ -36,21 +34,18 @@ export class MatchingEngineService {
 
     if (!incomingOrder || incomingOrder.status !== OrderStatus.OPEN) return;
 
-    // 🔥 Fetch ALL OPEN orders from DB
+    // Only match orders of the same category (delivery vs intraday)
     const openOrders = await this.prisma.order.findMany({
       where: {
-        stockId: incomingOrder.stockId,
-        status: OrderStatus.OPEN,
+        stockId:  incomingOrder.stockId,
+        status:   OrderStatus.OPEN,
+        category: incomingOrder.category, // ← match same category only
       },
       orderBy: { createdAt: 'asc' },
     });
 
-    // 🔥 Rebuild order book
     const book = this.orderBookService.getBook(incomingOrder.stockId);
-
-    // Clear existing (IMPORTANT)
-    book.clear(); // ⬅️ YOU NEED TO ADD THIS METHOD
-
+    book.clear();
     for (const order of openOrders) {
       this.orderBookService.addOrder(order);
     }
@@ -59,39 +54,37 @@ export class MatchingEngineService {
       await this.match({
         incomingOrder,
         matchingOrders: book.getSellOrders(),
-        getTradePrice: (_, sell) => Number(sell.price),
-        shouldMatch: (buy, sell) =>
+        getTradePrice:  (_, sell) => Number(sell.price),
+        shouldMatch:    (buy, sell) =>
           !!buy.price && !!sell.price && buy.price >= sell.price,
-        getBuyer: (buy, _) => ({ id: buy.id, userId: buy.userId }),
+        getBuyer:  (buy, _)  => ({ id: buy.id,  userId: buy.userId }),
         getSeller: (_, sell) => ({ id: sell.id, userId: sell.userId }),
       });
     } else {
       await this.match({
         incomingOrder,
         matchingOrders: book.getBuyOrders(),
-        getTradePrice: (_, buy) => Number(buy.price),
-        shouldMatch: (sell, buy) =>
+        getTradePrice:  (_, buy) => Number(buy.price),
+        shouldMatch:    (sell, buy) =>
           !!sell.price && !!buy.price && buy.price >= sell.price,
-        getBuyer: (_, buy) => ({ id: buy.id, userId: buy.userId }),
+        getBuyer:  (_, buy)  => ({ id: buy.id,  userId: buy.userId }),
         getSeller: (sell, _) => ({ id: sell.id, userId: sell.userId }),
       });
     }
   }
 
-  // ======================= UNIFIED MATCHING LOGIC =======================
-
   private async match(config: MatchConfig) {
     let { incomingOrder } = config;
-    const { matchingOrders, getTradePrice, shouldMatch, getBuyer, getSeller } = config;
+    const {
+      matchingOrders, getTradePrice,
+      shouldMatch, getBuyer, getSeller,
+    } = config;
 
     for (const matchingOrder of matchingOrders) {
       const remainingIncoming = incomingOrder.quantity - incomingOrder.filledQty;
       if (remainingIncoming <= 0) break;
 
-      // Price condition check
       if (!shouldMatch(incomingOrder, matchingOrder)) {
-        // For BUY orders, break if no match (sorted by price)
-        // For SELL orders, continue checking (buyers have different prices)
         if (incomingOrder.side === OrderSide.BUY) break;
         continue;
       }
@@ -99,80 +92,72 @@ export class MatchingEngineService {
       const remainingMatching = matchingOrder.quantity - matchingOrder.filledQty;
       if (remainingMatching <= 0) continue;
 
-      const matchQty = Math.min(remainingIncoming, remainingMatching);
+      const matchQty   = Math.min(remainingIncoming, remainingMatching);
       const tradePrice = getTradePrice(incomingOrder, matchingOrder);
-      const tradeValue = new Prisma.Decimal(matchQty).mul(tradePrice);
+      const buyer      = getBuyer(incomingOrder, matchingOrder);
+      const seller     = getSeller(incomingOrder, matchingOrder);
 
-      const buyer = getBuyer(incomingOrder, matchingOrder);
-      const seller = getSeller(incomingOrder, matchingOrder);
-
-      // 🟢 Update both orders
       const [updatedIncoming, updatedMatching] = await Promise.all([
         this.prisma.order.update({
           where: { id: incomingOrder.id },
-          data: { filledQty: { increment: matchQty } },
+          data:  { filledQty: { increment: matchQty } },
         }),
         this.prisma.order.update({
           where: { id: matchingOrder.id },
-          data: { filledQty: { increment: matchQty } },
+          data:  { filledQty: { increment: matchQty } },
         }),
       ]);
 
-      // 🟢 Create trade record
-    await this.tradeSettlementService.settleTrade({
-      buyOrderId: buyer.id,
-      sellOrderId: seller.id,
-      buyerId: buyer.userId,
-      sellerId: seller.userId,
-      stockId: incomingOrder.stockId,
-      price: tradePrice,
-      quantity: matchQty,
-    });
+      // ← Pass category so settlement knows delivery vs intraday
+      await this.tradeSettlement.settleTrade({
+        buyOrderId:  buyer.id,
+        sellOrderId: seller.id,
+        buyerId:     buyer.userId,
+        sellerId:    seller.userId,
+        stockId:     incomingOrder.stockId,
+        price:       tradePrice,
+        quantity:    matchQty,
+        category:    incomingOrder.category, // ← NEW
+      });
 
-
-
-      // 🟢 Finalize matching order if fully filled
-      if (updatedMatching.filledQty === updatedMatching.quantity) {
+      if (updatedMatching.filledQty >= updatedMatching.quantity) {
         await this.prisma.order.update({
           where: { id: matchingOrder.id },
-          data: { status: OrderStatus.FILLED },
+          data:  { status: OrderStatus.FILLED },
         });
-
-        //  REMOVE FROM ORDER BOOK
         this.orderBookService.removeorder(
           matchingOrder.stockId,
           matchingOrder.id,
-          matchingOrder.side
+          matchingOrder.side,
         );
       }
 
       incomingOrder = updatedIncoming;
     }
 
-    // 🟢 Finalize incoming order
-    const newStatus = this.determineOrderStatus(
+    const newStatus = this.determineStatus(
       incomingOrder.filledQty,
-      incomingOrder.quantity
+      incomingOrder.quantity,
     );
+
     if (newStatus !== OrderStatus.OPEN) {
       await this.prisma.order.update({
         where: { id: incomingOrder.id },
-        data: { status: newStatus },
+        data:  { status: newStatus },
       });
-
       if (newStatus === OrderStatus.FILLED) {
         this.orderBookService.removeorder(
           incomingOrder.stockId,
           incomingOrder.id,
-          incomingOrder.side
+          incomingOrder.side,
         );
       }
     }
   }
 
-  private determineOrderStatus(filledQty: number, totalQty: number): OrderStatus {
-    if (filledQty === 0) return OrderStatus.OPEN;
-    if (filledQty >= totalQty) return OrderStatus.FILLED;
+  private determineStatus(filledQty: number, totalQty: number): OrderStatus {
+    if (filledQty === 0)         return OrderStatus.OPEN;
+    if (filledQty >= totalQty)   return OrderStatus.FILLED;
     return OrderStatus.PARTIALLY_FILLED;
   }
 }
