@@ -202,6 +202,109 @@ export class MarketDataService implements OnModuleInit {
       return null;
     }
   }
+   // ─────────────────────────────────────────────────────────────
+  // fetchDetail 
+  // ─────────────────────────────────────────────────────────────
+  async fetchDetail(yahooSymbol: string): Promise<any> {
+    try {
+      if (!this.credentialsFetched) await this.refreshCredentials();
+  
+      // v10 quoteSummary gives fundamentals (works without subscription)
+      const url =
+        `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(yahooSymbol)}` +
+        `?modules=summaryDetail,defaultKeyStatistics,assetProfile,financialData` +
+        `&crumb=${encodeURIComponent(this.crumb)}`;
+  
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent':      BROWSER_UA,
+          'Accept':          'application/json',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Origin':          'https://finance.yahoo.com',
+          'Referer':         'https://finance.yahoo.com/',
+          'Cookie':          this.cookies,
+        },
+      });
+  
+      if (!res.ok) {
+        this.logger.warn(`fetchDetail HTTP ${res.status} for ${yahooSymbol}`);
+        return null;
+      }
+  
+      const data   = await res.json();
+      const result = data?.quoteSummary?.result?.[0];
+      if (!result)  return null;
+  
+      const sd = result.summaryDetail       ?? {};
+      const ks = result.defaultKeyStatistics ?? {};
+      const ap = result.assetProfile         ?? {};
+      const fd = result.financialData        ?? {};
+  
+      return {
+        marketCap:        sd.marketCap?.raw,
+        peRatio:          sd.trailingPE?.raw,
+        pbRatio:          ks.priceToBook?.raw,
+        dividendYield:    sd.dividendYield?.raw ? sd.dividendYield.raw * 100 : undefined,
+        fiftyTwoWeekHigh: sd.fiftyTwoWeekHigh?.raw,
+        fiftyTwoWeekLow:  sd.fiftyTwoWeekLow?.raw,
+        eps:              ks.trailingEps?.raw,
+        bookValue:        ks.bookValue?.raw,
+        beta:             sd.beta?.raw,
+        roe:              fd.returnOnEquity?.raw ? fd.returnOnEquity.raw * 100 : undefined,
+        debtToEquity:     fd.debtToEquity?.raw,
+        faceValue:        undefined, // not in Yahoo API
+        description:      ap.longBusinessSummary,
+        website:          ap.website,
+        employees:        ap.fullTimeEmployees,
+        sector:           ap.sector,
+        industry:         ap.industry,
+      };
+    } catch (err: any) {
+      this.logger.warn(`fetchDetail failed for ${yahooSymbol}: ${err.message}`);
+      return null;
+    }
+  }
+  // ─────────────────────────────────────────────────────────────
+  // fetchNews
+  // ─────────────────────────────────────────────────────────────
+  
+  async fetchNews(yahooSymbol: string): Promise<any[]> {
+    try {
+      if (!this.credentialsFetched) await this.refreshCredentials();
+  
+      const url =
+        `https://query1.finance.yahoo.com/v1/finance/search` +
+        `?q=${encodeURIComponent(yahooSymbol)}&newsCount=10&quotesCount=0` +
+        `&crumb=${encodeURIComponent(this.crumb)}`;
+  
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': BROWSER_UA,
+          'Accept':     'application/json',
+          'Cookie':     this.cookies,
+        },
+      });
+  
+      if (!res.ok) return [];
+  
+      const data = await res.json();
+      const news = (data?.news ?? []) as any[];
+  
+      return news.slice(0, 10).map((n: any) => ({
+        title:     n.title,
+        publisher: n.publisher,
+        link:      n.link,
+        timeAgo:   this.timeAgo(n.providerPublishTime),
+      }));
+    } catch (err: any) {
+      this.logger.warn(`fetchNews failed for ${yahooSymbol}: ${err.message}`);
+      return [];
+    }
+  }
+  
+
+  
+
 
   // ─────────────────────────────────────────────────────────────
   // getHistoricalData — OHLCV bars for charts
@@ -337,5 +440,14 @@ export class MarketDataService implements OnModuleInit {
 
   private sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  
+  private timeAgo(unixSeconds: number): string {
+    if (!unixSeconds) return "";
+    const diffMs   = Date.now() - unixSeconds * 1000;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60)    return `${diffMins}m ago`;
+    if (diffMins < 1440)  return `${Math.floor(diffMins / 60)}h ago`;
+    return `${Math.floor(diffMins / 1440)}d ago`;
   }
 }

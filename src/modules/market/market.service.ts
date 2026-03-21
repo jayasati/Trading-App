@@ -277,6 +277,67 @@ async fetchRealMarketPrices() {
   }
 }
 
+  // In market.service.ts — update getStockDetail:
+  async getStockDetail(stockId: string) {
+    const stock = await this.prisma.stock.findUnique({
+      where: { id: stockId },
+    });
+
+    if (!stock) return null;
+
+    let quote: any = null;
+
+    const cached = await this.redis.getClient().get(`quote:${stockId}`);
+    if (cached) {
+      quote = JSON.parse(cached);
+    } else if (stock.yahooSymbol) {
+      const live = await this.marketData.fetchSingleQuote(stock.yahooSymbol);
+      if (live) {
+        await this.updatePrice(stockId, live.price, {
+          open: live.open, high: live.high,
+          low:  live.low,  close: live.close, volume: live.volume,
+        });
+        await this.redis.recordView(stockId);
+        quote = live;
+      }
+    }
+
+    // ← Wrap in try/catch so Yahoo failure doesn't kill the whole response
+    let fundamentals: any = null;
+    try {
+      if (stock.yahooSymbol) {
+        fundamentals = await this.marketData.fetchDetail(stock.yahooSymbol);
+      }
+    } catch {
+      fundamentals = null;
+    }
+
+    // ← Always return stock data even if quote/fundamentals are null
+    return {
+      id:          stock.id,
+      symbol:      stock.symbol,
+      name:        stock.name,
+      exchange:    stock.exchange,
+      yahooSymbol: stock.yahooSymbol,
+      sector:      fundamentals?.sector   ?? (stock as any).sector   ?? null,
+      industry:    fundamentals?.industry ?? (stock as any).industry ?? null,
+      quote,
+      fundamentals,
+    };
+  }
+ 
+async getStockNews(stockId: string) {
+  const stock = await this.prisma.stock.findUnique({
+    where: { id: stockId },
+  });
+ 
+  if (!stock?.yahooSymbol) return [];
+ 
+  return this.marketData.fetchNews(stock.yahooSymbol);
+}
+
+
+
 // Returns only stocks that don't have a cached quote yet
   private async filterUncached(
     stocks: Array<{ id: string; symbol: string; yahooSymbol: string | null }>

@@ -39,4 +39,15 @@ export class MarketController {
   ) {
     return this.marketService.getPriceHistory(stockId, period);
   }
+
+  @Get('detail/:stockId')
+  getDetail(@Param('stockId') stockId: string) {
+    return this.marketService.getStockDetail(stockId);
+  }
+  
+  // GET /market/news/:stockId
+  @Get('news/:stockId')
+  getNews(@Param('stockId') stockId: string) {
+    return this.marketService.getStockNews(stockId);
+  }
 }
