@@ -37,13 +37,27 @@ export class MarketCronService {
     this.isRunning = true;
 
     try {
-      const stockIds = await this.redis.getRecentlyViewed();
-      if (!stockIds.length) return;
+      const [recentIds, holdingRows] = await Promise.all([
+        this.redis.getRecentlyViewed(),
+        this.prisma.holding.findMany({
+          where:  { quantity: { gt: 0 } },
+          select: { stockId: true },
+          distinct: ['stockId'],
+        }),
+      ]);
+      const holdingIds = holdingRows.map((h) => h.stockId);
+      const allIds     = [...new Set([...recentIds, ...holdingIds])];
+      if (!allIds.length) return;
+
+      this.logger.log(`Recent IDs: ${recentIds.length}`);
+      this.logger.log(`Holding IDs: ${holdingIds.length}`);
+      this.logger.log(`All IDs to fetch: ${allIds.length}`);
+
 
       const marketOpen = this.isMarketOpen();
 
       const stocks = await this.prisma.stock.findMany({
-        where:  { id: { in: stockIds }, isActive: true },
+        where:  { id: { in: allIds  }, isActive: true },
         select: { id: true, symbol: true, yahooSymbol: true },
       });
 
