@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+// src/modules/portfolio/holdings/holding.service.ts
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
 
@@ -6,7 +7,7 @@ import { Prisma } from '../../../generated/prisma/client';
 export class HoldingsService {
   constructor(private prisma: PrismaService) {}
 
-  // ─── Add holding with weighted average price ───
+  // ── Add holding with weighted average price ───────────────────────────────
   async addHolding(
     userId:   string,
     stockId:  string,
@@ -19,13 +20,11 @@ export class HoldingsService {
     });
 
     if (existing) {
-      // Weighted average price formula:
-      // newAvg = (oldAvg * oldQty + tradePrice * newQty) / (oldQty + newQty)
-      const oldQty   = existing.quantity;
-      const oldAvg   = Number(existing.avgPrice);
-      const price    = tradePrice ?? oldAvg;
-      const newQty   = oldQty + quantity;
-      const newAvg   = ((oldAvg * oldQty) + (price * quantity)) / newQty;
+      const oldQty = existing.quantity;
+      const oldAvg = Number(existing.avgPrice);
+      const price  = tradePrice ?? oldAvg;
+      const newQty = oldQty + quantity;
+      const newAvg = ((oldAvg * oldQty) + (price * quantity)) / newQty;
 
       await tx.holding.update({
         where: { id: existing.id },
@@ -35,7 +34,6 @@ export class HoldingsService {
         },
       });
     } else {
-      // First time buying this stock
       await tx.holding.create({
         data: {
           userId,
@@ -47,7 +45,7 @@ export class HoldingsService {
     }
   }
 
-  // ─── Remove holding when selling ───
+  // ── Remove holding when selling ───────────────────────────────────────────
   async removeHolding(
     userId:   string,
     stockId:  string,
@@ -58,17 +56,22 @@ export class HoldingsService {
       where: { userId_stockId: { userId, stockId } },
     });
 
-    if (!holding || holding.quantity < quantity) {
-      throw new Error('Insufficient holdings');
+    // ── Clear error instead of FK crash ──────────────────────────────────────
+    if (!holding) {
+      throw new BadRequestException(
+        'You do not hold this stock. Cannot place a sell order.'
+      );
+    }
+
+    if (holding.quantity < quantity) {
+      throw new BadRequestException(
+        `Insufficient holdings. You hold ${holding.quantity} shares but tried to sell ${quantity}.`
+      );
     }
 
     if (holding.quantity === quantity) {
-      // Sold everything — delete the row
-      await tx.holding.delete({
-        where: { id: holding.id },
-      });
+      await tx.holding.delete({ where: { id: holding.id } });
     } else {
-      // Partial sell — avgPrice stays the same (cost basis doesn't change on sell)
       await tx.holding.update({
         where: { id: holding.id },
         data: {
@@ -79,10 +82,10 @@ export class HoldingsService {
     }
   }
 
-  // ─── Get all holdings for a user with stock info ───
+  // ── Get all holdings for a user ───────────────────────────────────────────
   async getUserHoldings(userId: string) {
     return this.prisma.holding.findMany({
-      where: { userId },
+      where:   { userId },
       include: { stock: true },
       orderBy: { updatedAt: 'desc' },
     });

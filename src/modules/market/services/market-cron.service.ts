@@ -1,4 +1,4 @@
-// Responsibility: ONLY scheduled jobs (price refresh + square-off)
+// src/modules/market/services/market-cron.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -7,19 +7,23 @@ import { MarketDataService } from './market-data.service';
 import { MarketCacheService } from './market-cache.service';
 import { MarketBroadcastService } from './market-broadcast.service';
 import { PositionsService } from '../../positions/positions.service';
+import { MatchingEngineService, MarketDepthInput } from '../../orders/matching-engine.service';
+import { OrderStatus } from '../../../generated/prisma/client';
 
 @Injectable()
 export class MarketCronService {
   private readonly logger   = new Logger(MarketCronService.name);
   private isRunning         = false;
+  private isRetrying        = false;
 
   constructor(
-    private readonly prisma:     PrismaService,
-    private readonly redis:      RedisService,
-    private readonly marketData: MarketDataService,
-    private readonly cache:      MarketCacheService,
-    private readonly broadcast:  MarketBroadcastService,
-    private readonly positions:  PositionsService,
+    private readonly prisma:         PrismaService,
+    private readonly redis:          RedisService,
+    private readonly marketData:     MarketDataService,
+    private readonly cache:          MarketCacheService,
+    private readonly broadcast:      MarketBroadcastService,
+    private readonly positions:      PositionsService,
+    private readonly matchingEngine: MatchingEngineService,
   ) {}
 
   private isMarketOpen(): boolean {
@@ -30,7 +34,41 @@ export class MarketCronService {
     return day >= 1 && day <= 5 && mins >= 540 && mins <= 930;
   }
 
-  // ── Refresh recently-viewed stock prices every 10 seconds ──
+  // ── Fetch depth using MarketDataService (already injected) ────────────────
+  private async fetchDepth(yahooSymbol: string): Promise<MarketDepthInput | null> {
+    try {
+      const quote = await this.marketData.fetchSingleQuote(yahooSymbol);
+      if (!quote) return null;
+
+      const mid  = quote.price;
+      const tick = this.getTickSize(mid);
+
+      const bids = Array.from({ length: 5 }, (_, i) => ({
+        price:    parseFloat((mid - i * tick).toFixed(2)),
+        quantity: Math.round(5000 * Math.max(0.3, 1 - i * 0.18)),
+      }));
+      const asks = Array.from({ length: 5 }, (_, i) => ({
+        price:    parseFloat((mid + (i + 1) * tick).toFixed(2)),
+        quantity: Math.round(5000 * Math.max(0.3, 1 - i * 0.18)),
+      }));
+
+      return { bids, asks };
+    } catch {
+      return null;
+    }
+  }
+
+  private getTickSize(price: number): number {
+    if (price < 10)   return 0.01;
+    if (price < 25)   return 0.05;
+    if (price < 100)  return 0.10;
+    if (price < 500)  return 0.25;
+    if (price < 1000) return 0.50;
+    if (price < 2500) return 1.00;
+    return 5.00;
+  }
+
+  // ── Refresh prices every 10 seconds ──────────────────────────────────────
   @Cron('*/10 * * * * *')
   async fetchRealMarketPrices() {
     if (this.isRunning) return;
@@ -40,24 +78,19 @@ export class MarketCronService {
       const [recentIds, holdingRows] = await Promise.all([
         this.redis.getRecentlyViewed(),
         this.prisma.holding.findMany({
-          where:  { quantity: { gt: 0 } },
-          select: { stockId: true },
+          where:    { quantity: { gt: 0 } },
+          select:   { stockId: true },
           distinct: ['stockId'],
         }),
       ]);
+
       const holdingIds = holdingRows.map((h) => h.stockId);
       const allIds     = [...new Set([...recentIds, ...holdingIds])];
       if (!allIds.length) return;
 
-      this.logger.log(`Recent IDs: ${recentIds.length}`);
-      this.logger.log(`Holding IDs: ${holdingIds.length}`);
-      this.logger.log(`All IDs to fetch: ${allIds.length}`);
-
-
       const marketOpen = this.isMarketOpen();
-
-      const stocks = await this.prisma.stock.findMany({
-        where:  { id: { in: allIds  }, isActive: true },
+      const stocks     = await this.prisma.stock.findMany({
+        where:  { id: { in: allIds }, isActive: true },
         select: { id: true, symbol: true, yahooSymbol: true },
       });
 
@@ -67,23 +100,19 @@ export class MarketCronService {
 
       if (!stocksToFetch.length) return;
 
-      const yahooSymbols = stocksToFetch
-        .map(s => s.yahooSymbol)
-        .filter(Boolean) as string[];
-
-      const quotes    = await this.marketData.getLiveQuotes(yahooSymbols);
-      const quoteMap  = new Map(quotes.map(q => [q.yahooSymbol, q]));
-      let   updated   = 0;
+      const yahooSymbols = stocksToFetch.map((s) => s.yahooSymbol).filter(Boolean) as string[];
+      const quotes       = await this.marketData.getLiveQuotes(yahooSymbols);
+      const quoteMap     = new Map(quotes.map((q) => [q.yahooSymbol, q]));
+      let   updated      = 0;
 
       for (const stock of stocksToFetch) {
         let quote = quoteMap.get(stock.yahooSymbol!);
-
         if (!quote?.price) {
           quote = await this.marketData.fetchSingleQuote(stock.yahooSymbol!) ?? undefined;
         }
         if (!quote?.price && stock.yahooSymbol?.endsWith('.NS')) {
-          const boSymbol = stock.yahooSymbol.replace('.NS', '.BO');
-          quote = await this.marketData.fetchSingleQuote(boSymbol) ?? undefined;
+          const bo = stock.yahooSymbol.replace('.NS', '.BO');
+          quote    = await this.marketData.fetchSingleQuote(bo) ?? undefined;
         }
         if (!quote?.price) continue;
 
@@ -91,30 +120,69 @@ export class MarketCronService {
           data: {
             stockId: stock.id,
             price: quote.price, open: quote.open,
-            high: quote.high,   low: quote.low,
+            high:  quote.high,  low:  quote.low,
             close: quote.close, volume: quote.volume,
           },
         });
-
         await this.cache.setPrice(stock.id, quote.price, marketOpen);
         await this.cache.setQuote(stock.id, quote, marketOpen);
         this.broadcast.broadcast(stock.id, quote.price, quote);
         updated++;
       }
 
-      if (updated > 0) {
-        this.logger.log(
-          `✅ Refreshed ${updated} stocks (${marketOpen ? 'LIVE' : 'after-hours cache'})`
-        );
-      }
+      if (updated > 0) this.logger.log(`✅ Refreshed ${updated} stocks`);
     } catch (err: any) {
-      this.logger.error(`Cron failed: ${err.message}`);
+      this.logger.error(`Price cron failed: ${err.message}`);
     } finally {
       this.isRunning = false;
     }
   }
 
-  // ── Auto square-off intraday positions at 3:20 PM IST ──
+  // ── Retry open LIMIT orders every 10 seconds ─────────────────────────────
+  @Cron('*/10 * * * * *')
+  async retryOpenLimitOrders() {
+    if (!this.isMarketOpen()) return;
+    if (this.isRetrying) return;
+    this.isRetrying = true;
+
+    try {
+      const openOrders = await this.prisma.order.findMany({
+        where:   {
+          status: { in: [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED] },
+          type:   'LIMIT',
+        },
+        include: { stock: true },
+      });
+
+      if (!openOrders.length) return;
+
+      this.logger.log(`🔄 Retrying ${openOrders.length} open LIMIT orders`);
+
+      // Group by stock — one Yahoo fetch per stock
+      const byStock = new Map<string, { orderId: string; yahooSymbol: string }[]>();
+      for (const o of openOrders) {
+        const sym  = (o.stock as any).yahooSymbol ?? `${(o.stock as any).symbol}.NS`;
+        const list = byStock.get(o.stockId) ?? [];
+        list.push({ orderId: o.id, yahooSymbol: sym });
+        byStock.set(o.stockId, list);
+      }
+
+      for (const [, orders] of byStock) {
+        const depth = await this.fetchDepth(orders[0].yahooSymbol);
+        if (!depth) continue;
+
+        for (const { orderId } of orders) {
+          await this.matchingEngine.processOrder(orderId, depth);
+        }
+      }
+    } catch (err: any) {
+      this.logger.error(`Order retry cron failed: ${err.message}`);
+    } finally {
+      this.isRetrying = false;
+    }
+  }
+
+  // ── Auto square-off at 3:20 PM IST ───────────────────────────────────────
   @Cron('20 15 * * 1-5', { timeZone: 'Asia/Kolkata' })
   async squareOffIntradayPositions() {
     this.logger.log('🔔 3:20 PM — Auto square-off intraday positions');

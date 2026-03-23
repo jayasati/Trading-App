@@ -1,3 +1,4 @@
+// src/modules/market/market.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { MarketController } from './market.controller';
 import { MarketService } from './market.service';
@@ -8,11 +9,13 @@ import { MarketBroadcastService } from './services/market-broadcast.service';
 import { MarketCronService } from './services/market-cron.service';
 import { RedisModule } from '../../common/redis/redis.module';
 import { PositionsModule } from '../positions/positions.module';
+import { OrdersModule } from '../orders/orders.module';
 
 @Module({
   imports: [
     RedisModule,
     forwardRef(() => PositionsModule),
+    forwardRef(() => OrdersModule),
   ],
   controllers: [MarketController],
   providers: [

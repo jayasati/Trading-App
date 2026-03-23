@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+// src/modules/orders/orders.module.ts
+import { forwardRef, Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { OrderBookService } from './order-book.service';
@@ -9,9 +10,16 @@ import { WalletModule } from '../wallet/wallet.module';
 import { PortfolioModule } from '../portfolio/portfolio.module';
 import { PositionsModule } from '../positions/positions.module';
 import { SettlementModule } from '../settlement/settlement.module';
+import { MarketModule } from '../market/market.module';
 
 @Module({
-  imports: [WalletModule, PortfolioModule, PositionsModule, SettlementModule],
+  imports: [
+    WalletModule,
+    PortfolioModule,
+    PositionsModule,
+    SettlementModule,
+    forwardRef(() => MarketModule),
+  ],
   controllers: [OrdersController],
   providers: [
     OrdersService,
@@ -20,6 +28,10 @@ import { SettlementModule } from '../settlement/settlement.module';
     DeliveryOrderStrategy,
     IntradayOrderStrategy,
   ],
-  exports: [OrderBookService],
+  exports: [
+    OrdersService,
+    OrderBookService,
+    MatchingEngineService,
+  ],
 })
 export class OrdersModule {}
