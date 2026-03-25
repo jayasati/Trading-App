@@ -616,7 +616,7 @@ export class MarketDataService implements OnModuleInit {
   private getPeriodConfig(period: string): { startDate: Date; interval: ChartInterval } {
     const now = new Date();
     const map: Record<string, { days: number; interval: ChartInterval }> = {
-      '1D': { days: 1,    interval: '5m'  },
+      '1D': { days: 1,    interval: '1m'  },
       '1W': { days: 7,    interval: '15m' },
       '1M': { days: 30,   interval: '1d'  },
       '3M': { days: 90,   interval: '1d'  },

@@ -11,6 +11,7 @@ import { TradeSettlementService } from '../settlement/trade-settlement.service';
 import { MarketDataService } from '../market/services/market-data.service';
 import { OrderSide, OrderStatus, OrderType, OrderCategory } from '../../generated/prisma/client';
 import { OrderStrategy } from './strategies/order-strategy.interface';
+import { isMarketOpen } from '../../common/utils/market-hours';
 
 @Injectable()
 export class OrdersService {
@@ -32,20 +33,13 @@ export class OrdersService {
   }
 
   // ── Market hours: Mon–Fri 09:15–15:30 IST ────────────────────────────────
-  private isMarketOpen(): boolean {
-    const now  = new Date();
-    const ist  = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-    const day  = ist.getUTCDay();
-    const mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-    return day >= 1 && day <= 5 && mins >= 555 && mins <= 930;
-  }
 
   async placeOrder(data: any) {
     const category = data.category ?? OrderCategory.DELIVERY;
     const strategy = this.strategyMap[category];
 
     // ── INTRADAY only allowed during market hours ─────────────────────────
-    if (category === OrderCategory.INTRADAY && !this.isMarketOpen()) {
+    if (category === OrderCategory.INTRADAY && !isMarketOpen()) {
       throw new BadRequestException(
         'Intraday orders are only available Mon–Fri between 9:15 AM and 3:30 PM IST.'
       );
@@ -58,7 +52,7 @@ export class OrdersService {
     // MARKET + DELIVERY during market hours → fill immediately
     // MARKET + DELIVERY outside market hours → treat as LIMIT at submitted price
     //   (rare edge case, handled by falling through to createAndMatchOrder)
-    if (data.type === OrderType.MARKET && this.isMarketOpen()) {
+    if (data.type === OrderType.MARKET && isMarketOpen()) {
       return this.executeMarketOrder(data, category);
     }
 
@@ -115,7 +109,7 @@ export class OrdersService {
     });
 
     // Only attempt immediate match if market is currently open
-    if (this.isMarketOpen()) {
+    if (isMarketOpen()) {
       const yahooSymbol = (order.stock as any).yahooSymbol
         ?? `${(order.stock as any).symbol}.NS`;
       const depth = await this.fetchDepth(yahooSymbol);

@@ -10,10 +10,12 @@ import { MarketCronService } from './services/market-cron.service';
 import { RedisModule } from '../../common/redis/redis.module';
 import { PositionsModule } from '../positions/positions.module';
 import { OrdersModule } from '../orders/orders.module';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
     RedisModule,
+    WalletModule,                        // ← needed by cancelUnfilledOrdersAtClose
     forwardRef(() => PositionsModule),
     forwardRef(() => OrdersModule),
   ],

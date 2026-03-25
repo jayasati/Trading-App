@@ -8,7 +8,10 @@ import { MarketCacheService } from './market-cache.service';
 import { MarketBroadcastService } from './market-broadcast.service';
 import { PositionsService } from '../../positions/positions.service';
 import { MatchingEngineService, MarketDepthInput } from '../../orders/matching-engine.service';
-import { OrderStatus } from '../../../generated/prisma/client';
+import { OrderStatus, OrderCategory, OrderSide } from '../../../generated/prisma/client';
+import { isMarketOpen } from '../../../common/utils/market-hours';
+import { WalletService } from '../../wallet/wallet.service';
+import { Prisma } from '../../../generated/prisma/client';
 
 @Injectable()
 export class MarketCronService {
@@ -24,17 +27,10 @@ export class MarketCronService {
     private readonly broadcast:      MarketBroadcastService,
     private readonly positions:      PositionsService,
     private readonly matchingEngine: MatchingEngineService,
+    private readonly wallet:         WalletService,
   ) {}
 
-  private isMarketOpen(): boolean {
-    const now  = new Date();
-    const ist  = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-    const day  = ist.getUTCDay();
-    const mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-    return day >= 1 && day <= 5 && mins >= 540 && mins <= 930;
-  }
-
-  // ── Fetch depth using MarketDataService (already injected) ────────────────
+  // ── Build depth from live quote ───────────────────────────────────────────
   private async fetchDepth(yahooSymbol: string): Promise<MarketDepthInput | null> {
     try {
       const quote = await this.marketData.fetchSingleQuote(yahooSymbol);
@@ -88,7 +84,7 @@ export class MarketCronService {
       const allIds     = [...new Set([...recentIds, ...holdingIds])];
       if (!allIds.length) return;
 
-      const marketOpen = this.isMarketOpen();
+      const marketOpen = isMarketOpen();
       const stocks     = await this.prisma.stock.findMany({
         where:  { id: { in: allIds }, isActive: true },
         select: { id: true, symbol: true, yahooSymbol: true },
@@ -139,17 +135,20 @@ export class MarketCronService {
   }
 
   // ── Retry open LIMIT orders every 10 seconds ─────────────────────────────
+  // ONLY fires during market hours (Mon–Fri 09:15–15:30 IST)
   @Cron('*/10 * * * * *')
   async retryOpenLimitOrders() {
-    if (!this.isMarketOpen()) return;
+    // ── Hard gate: do nothing outside market hours ────────────────────────
+    if (!isMarketOpen()) return;
     if (this.isRetrying) return;
     this.isRetrying = true;
 
     try {
       const openOrders = await this.prisma.order.findMany({
         where:   {
-          status: { in: [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED] },
-          type:   'LIMIT',
+          status:   { in: [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED] },
+          type:     'LIMIT',
+          category: OrderCategory.DELIVERY, // only delivery queued orders
         },
         include: { stock: true },
       });
@@ -182,7 +181,74 @@ export class MarketCronService {
     }
   }
 
-  // ── Auto square-off at 3:20 PM IST ───────────────────────────────────────
+  // ── Cancel all unfilled LIMIT orders at 3:30 PM IST ──────────────────────
+  // Any delivery order that wasn't filled by end of trading day gets cancelled
+  // and locked funds are released back to the user's wallet.
+  @Cron('30 15 * * 1-5', { timeZone: 'Asia/Kolkata' })
+  async cancelUnfilledOrdersAtClose() {
+    this.logger.log('🔔 3:30 PM — Cancelling all unfilled LIMIT orders');
+
+    try {
+      const openOrders = await this.prisma.order.findMany({
+        where: {
+          status:   { in: [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED] },
+          type:     'LIMIT',
+          category: OrderCategory.DELIVERY,
+        },
+      });
+
+      if (!openOrders.length) {
+        this.logger.log('No unfilled orders to cancel');
+        return;
+      }
+
+      let cancelled = 0;
+
+      for (const order of openOrders) {
+        try {
+          await this.prisma.$transaction(async (tx) => {
+            // Mark as cancelled
+            await tx.order.update({
+              where: { id: order.id },
+              data:  { status: OrderStatus.CANCELLED },
+            });
+
+            const unfilledQty = order.quantity - order.filledQty;
+            if (unfilledQty <= 0) return;
+
+            // Release locked funds for BUY orders
+            if (order.side === OrderSide.BUY && order.price) {
+              const amount = new Prisma.Decimal(Number(order.price) * unfilledQty);
+              await this.wallet.releaseFunds(order.userId, amount, tx);
+            }
+
+            // Release locked holdings for SELL orders
+            if (order.side === OrderSide.SELL) {
+              const holding = await tx.holding.findUnique({
+                where: { userId_stockId: { userId: order.userId, stockId: order.stockId } },
+              });
+              if (holding && holding.lockedQty > 0) {
+                await tx.holding.update({
+                  where: { id: holding.id },
+                  data:  { lockedQty: { decrement: Math.min(unfilledQty, holding.lockedQty) } },
+                });
+              }
+            }
+          });
+
+          cancelled++;
+        } catch (err: any) {
+          this.logger.error(`Failed to cancel order ${order.id}: ${err.message}`);
+        }
+      }
+
+      this.logger.log(`✅ Cancelled ${cancelled} unfilled orders at market close`);
+    } catch (err: any) {
+      this.logger.error(`End-of-day cancel failed: ${err.message}`);
+    }
+  }
+
+  // ── Auto square-off intraday positions at 3:20 PM IST ────────────────────
   @Cron('20 15 * * 1-5', { timeZone: 'Asia/Kolkata' })
   async squareOffIntradayPositions() {
     this.logger.log('🔔 3:20 PM — Auto square-off intraday positions');
