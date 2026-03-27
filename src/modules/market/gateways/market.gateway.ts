@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { SubscribeMessage,MessageBody,ConnectedSocket } from '@nestjs/websockets';
 
 @WebSocketGateway({
   cors: { origin: '*' },
@@ -27,6 +28,24 @@ export class MarketGateway
     this.logger.log(`Client connected: ${client.id}`);
   }
 
+  @SubscribeMessage('join-stock')
+  handleJoinStock(
+    @MessageBody() stockId :string,
+    @ConnectedSocket() client :Socket,
+  ){
+    client.join(stockId);
+    this.logger.log(`client ${client.id} joined stock room ${stockId}`);
+  }
+
+  @SubscribeMessage('leave-stock')
+  handleLeaveStock(
+    @MessageBody() stockId : string,
+    @ConnectedSocket() client :Socket,
+  ){
+    client.leave(stockId);
+    this.logger.log(`Client ${client.id} left stock room : ${stockId}`);
+  }
+
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
@@ -43,7 +62,7 @@ export class MarketGateway
       volume: number;
     },
   ) {
-    this.server.emit('price-update', {
+    this.server.to(stockId).emit('price-update', {
       stockId,
       price,
       open:      ohlcv?.open,
