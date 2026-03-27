@@ -3,6 +3,7 @@ import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { WalletService } from '../wallet/wallet.service';
 import { Prisma, PositionStatus } from '../../generated/prisma/client';
+import { RedisService } from '../../common/redis/redis.service';
 
 @Injectable()
 export class PositionsService {
@@ -11,6 +12,7 @@ export class PositionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly wallet: WalletService,
+    private readonly redis:   RedisService,
   ) {}
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -130,6 +132,10 @@ export class PositionsService {
   // ─────────────────────────────────────────────────────────────────────────
   // getUserPositions — today's positions with live MTM P&L
   // ─────────────────────────────────────────────────────────────────────────
+  // ── getUserPositions ── today's positions with live MTM P&L ─────────────────
+  // FIXED: now reads live price from Redis cache instead of defaulting to avgBuy.
+  // This means the backend response already contains the correct LTP, so the
+  // frontend P&L is correct even before the WebSocket fires.
   async getUserPositions(userId: string) {
     const tradingDate = this.getTradingDate();
 
@@ -147,16 +153,19 @@ export class PositionsService {
         const sellQty = pos.sellQty;
         const netQty  = pos.quantity;
 
-        // Try to get live price from Redis cache
-        let livePrice = avgBuy; // fallback to avg buy price
+        // ── Pull live price from Redis cache ──────────────────────────────────
+        // Key written by MarketCacheService: `price:{stockId}`
+        let livePrice = avgBuy; // safe fallback
         try {
-          const cached = await this.prisma.$queryRawUnsafe<{ price: string }[]>(
-            `SELECT '0' as price` // placeholder — Redis is injected via MarketService cron
+          const cached = await this.prisma.$queryRawUnsafe<{ val: string | null }[]>(
+            `SELECT NULL as val` // placeholder — we use RedisService below
           );
-          // Real live prices come via WebSocket to frontend;
-          // here we just use avgBuyPrice as server-side fallback
+          // RedisService is not injected here yet — inject it in the constructor.
+          // See constructor fix below.
+          const redisVal = await this.redis.getClient().get(`price:${pos.stockId}`);
+          if (redisVal) livePrice = Number(redisVal);
         } catch {
-          // ignore
+          // Redis unavailable — livePrice stays as avgBuy fallback
         }
 
         const matchedQty    = Math.min(buyQty, sellQty);
@@ -176,7 +185,7 @@ export class PositionsService {
           sellQty,
           avgBuyPrice:    avgBuy,
           avgSellPrice:   avgSell,
-          livePrice,
+          livePrice,                               // ← now real, not avgBuy
           realisedPnl:    Number(realisedPnl.toFixed(2)),
           unrealisedPnl:  Number(unrealisedPnl.toFixed(2)),
           totalPnl:       Number(totalPnl.toFixed(2)),
@@ -190,32 +199,44 @@ export class PositionsService {
     return enriched;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // autoSquareOff — called by cron at 3:20 PM IST
-  // FIX: removed tx.trade.create (foreign key violation — 'SQUARE_OFF' is not
-  //      a real Order id). We just credit the wallet and close the position.
-  // ─────────────────────────────────────────────────────────────────────────
+// ── autoSquareOff ── called by cron at 3:20 PM IST ──────────────────────────
+  // For intraday BUY positions:
+  //   - At order time: wallet locked only 20% margin (price × qty / 5)
+  //   - At square-off : we need to return PnL to wallet, not the full trade value
+  //
+  // Formula:
+  //   pnl            = (squareOffPrice - avgBuyPrice) × qty
+  //   marginReturned = margin originally locked = avgBuyPrice × qty / 5
+  //   creditAmount   = marginReturned + pnl
+  //
+  // This keeps the wallet consistent regardless of profit or loss.
   async autoSquareOff(
     stockId:  string,
     userId:   string,
     quantity: number,
     price:    number,
   ) {
-    const tradeValue  = new Prisma.Decimal(price * quantity);
     const tradingDate = this.getTradingDate();
 
     return this.prisma.$transaction(async (tx) => {
-      // Credit the user's wallet with the square-off proceeds
-      await this.wallet.creditBalance(userId, tradeValue, tx);
-
-      // Update the position to reflect the square-off sell
       const position = await tx.position.findFirst({
         where: { userId, stockId, tradingDate },
       });
 
       if (position) {
+        const avgBuy   = Number(position.avgBuyPrice);
+        const margin   = new Prisma.Decimal(avgBuy * quantity).div(5);   // 20% originally locked
+        const pnl      = new Prisma.Decimal((price - avgBuy) * quantity); // can be negative
+        const credit   = margin.add(pnl);                                  // return margin ± pnl
+
+        // Only credit if result is positive (don't go below 0)
+        const safeCredit = credit.gt(0) ? credit : new Prisma.Decimal(0);
+        await this.wallet.creditBalance(userId, safeCredit, tx);
+
         const newSellQty   = position.sellQty + quantity;
-        const newSellValue = new Prisma.Decimal(position.sellValue).add(tradeValue);
+        const newSellValue = new Prisma.Decimal(position.sellValue).add(
+          new Prisma.Decimal(price * quantity)
+        );
         const newAvgSell   = newSellValue.div(newSellQty);
 
         await tx.position.update({
@@ -228,14 +249,18 @@ export class PositionsService {
             status:       PositionStatus.SQUARED_OFF,
           },
         });
-      }
 
-      this.logger.log(
-        `Auto square-off: ${quantity} shares of stockId=${stockId} for userId=${userId} @ ₹${price}`
-      );
+        this.logger.log(
+          `Auto square-off: ${quantity} × stockId=${stockId} for userId=${userId} ` +
+          `@ ₹${price} | margin=₹${margin} pnl=₹${pnl} credit=₹${safeCredit}`
+        );
+      } else {
+        this.logger.warn(
+          `autoSquareOff: no position found for userId=${userId} stockId=${stockId} date=${tradingDate}`
+        );
+      }
     });
   }
-
   // ─────────────────────────────────────────────────────────────────────────
   // getAllOpenPositions — used by MarketService cron for square-off
   // ─────────────────────────────────────────────────────────────────────────

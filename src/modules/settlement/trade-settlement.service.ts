@@ -35,6 +35,11 @@ export class TradeSettlementService {
     } = input;
 
     const tradeValue = new Decimal(price * quantity);
+    
+    const lockedAmount = category === OrderCategory.INTRADAY
+                ? new Decimal(price * quantity).div(5)
+                : tradeValue;
+
 
     // 'MARKET_BOOK' = this side is real market liquidity, not a real user order
     const userIsBuying  = sellerId === 'MARKET_BOOK'; // user placed BUY
@@ -50,7 +55,7 @@ export class TradeSettlementService {
 
       if (userIsBuying) {
         // User BUY against real ask levels
-        await this.wallet.consumeLockedFunds(buyerId, tradeValue, tx);
+        await this.wallet.consumeLockedFunds(buyerId, lockedAmount, tx);
 
         if (category === OrderCategory.DELIVERY) {
           await this.holdings.addHolding(buyerId, stockId, quantity, tx, price);
@@ -69,8 +74,12 @@ export class TradeSettlementService {
         }
 
       } else {
+        const buyerLockedAmount =
+          category === OrderCategory.INTRADAY
+            ? new Decimal(price * quantity).div(5)
+           : tradeValue;
         // Normal LIMIT-to-LIMIT match between two real users
-        await this.wallet.consumeLockedFunds(buyerId, tradeValue, tx);
+        await this.wallet.consumeLockedFunds(buyerId, buyerLockedAmount, tx);
         await this.wallet.creditBalance(sellerId, tradeValue, tx);
 
         if (category === OrderCategory.DELIVERY) {
