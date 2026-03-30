@@ -27,16 +27,30 @@ import { TickSizeService } from './domain/depth/tick-size.service';
 import { OrderGroupingService } from './domain/order/order-grouping.service';
 import { PriceProcessorService } from './domain/pricing/price-processor.service';
 
+// Yahoo Integrations
+import { YahooAuthService } from './integrations/yahoo/yahoo-auth.service';
+import { YahooQuoteService } from './integrations/yahoo/yahoo-quote.service';
+import { YahooChartService } from './integrations/yahoo/yahoo-chart.service';
+import { YahooSearchService } from './integrations/yahoo/yahoo-search.service';
+import { YahooDetailService } from './integrations/yahoo/yahoo-detail.service'; // Bug fix: was missing
+
+// News Services
+import { NewsService } from './news/news.service';
+import { RssNewsService } from './news/rss-news.service';
+import { NewsApiService } from './news/newsapi.service';
+
 // External Modules
 import { RedisModule } from '../../common/redis/redis.module';
 import { PositionsModule } from '../positions/positions.module';
 import { OrdersModule } from '../orders/orders.module';
 import { WalletModule } from '../wallet/wallet.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     RedisModule,
     WalletModule,
+    ConfigModule,
     forwardRef(() => PositionsModule),
     forwardRef(() => OrdersModule),
   ],
@@ -44,29 +58,41 @@ import { WalletModule } from '../wallet/wallet.module';
   controllers: [MarketController],
 
   providers: [
-    // Core
+    // ================= CORE =================
     MarketService,
     MarketGateway,
 
-    // Infra
+    // ================= INFRA =================
     MarketDataService,
     MarketCacheService,
     MarketBroadcastService,
 
-    // Cron
+    // ================= CRON =================
     MarketCronService,
 
-    // Jobs (🔥 NEW)
+    // ================= JOBS =================
     PriceRefreshJob,
     OrderRetryJob,
     CancelOrdersJob,
     SquareOffJob,
 
-    // Domain (🔥 NEW)
+    // ================= DOMAIN =================
     DepthBuilderService,
     TickSizeService,
     OrderGroupingService,
     PriceProcessorService,
+
+    // ================= YAHOO INTEGRATIONS =================
+    YahooAuthService,
+    YahooQuoteService,
+    YahooChartService,
+    YahooSearchService,
+    YahooDetailService, // Bug fix: was not registered as a provider
+
+    // ================= NEWS =================
+    NewsService,
+    RssNewsService,
+    NewsApiService,
   ],
 
   exports: [

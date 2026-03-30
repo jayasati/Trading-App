@@ -5,7 +5,7 @@ import { MarketDataService } from '../services/market-data.service';
 import { MarketCacheService } from '../services/market-cache.service';
 import { MarketBroadcastService } from '../services/market-broadcast.service';
 import { isMarketOpen } from '../../../common/utils/market-hours';
-
+import { Quote } from '../types/market.types';
 
 @Injectable()
 export class PriceRefreshJob{
@@ -49,10 +49,12 @@ export class PriceRefreshJob{
 
             const symbols=stocks.map(s=>s.yahooSymbol).filter(Boolean) as string[];
             const quotes=await this.marketData.getLiveQuotes(symbols);
-            const map=new Map(quotes.map(q=>[q.yahooSymbol,q]));
+            const map = new Map<string, Quote>(
+                quotes.map(q => [q.yahooSymbol, q])
+            );
 
             for(const stock of stocks ){
-                let quote=map.get(stock.yahooSymbol!)||null;
+                let quote: Quote | null = map.get(stock.yahooSymbol!) ?? null;
 
                 if(!quote?.price){
                     quote=await this.marketData.fetchSingleQuote(stock.yahooSymbol!);
