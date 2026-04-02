@@ -1,35 +1,156 @@
-import { Injectable } from '@nestjs/common';
+// src/modules/orders/strategies/intraday-order.strategy.ts
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { WalletService } from '../../wallet/wallet.service';
-import { PositionsService } from '../../positions/positions.service';
 import { OrderSide, Prisma } from '../../../generated/prisma/client';
 import { OrderStrategy } from './order-strategy.interface';
+import { calculateIntradayMargin } from '../../../common/utils/intraday-margin';
+import { PlaceOrderInput } from '../types/place-order-input.type';
+import { ReleaseFundsOrder } from '../types/release-funds-order.type';
 
 @Injectable()
 export class IntradayOrderStrategy implements OrderStrategy {
   constructor(
-    private readonly wallet:    WalletService,
-    private readonly positions: PositionsService,
+    private readonly wallet: WalletService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  async validate(data: any): Promise<void> {
+  // ── validate ───────────────────────────────────────────────────────────────
+  // Called BEFORE prepareFunds. For intraday SELL we pre-check balance here
+  // so the error message is clear ("Insufficient balance") rather than a
+  // cryptic DB error from lockFunds.
+  async validate(data: PlaceOrderInput): Promise<void> {
     if (data.side !== OrderSide.SELL) return;
-    await this.positions.validateIntradaySell(data.userId, data.stockId, data.quantity);
+
+    // Check if selling to close an existing long (no margin needed for that part)
+    const tradingDate  = this.getTradingDate();
+    const existingPos  = await this.prisma.position.findUnique({
+      where: {
+        userId_stockId_tradingDate: {
+          userId:  data.userId,
+          stockId: data.stockId,
+          tradingDate,
+        },
+      },
+    });
+
+    const netLongQty = existingPos
+      ? Math.max(existingPos.buyQty - existingPos.sellQty, 0)
+      : 0;
+
+    // How many shares need short-sell margin
+    const shortQty = Math.max(data.quantity - netLongQty, 0);
+
+    if (shortQty > 0) {
+      if (data.price == null) {
+        throw new BadRequestException('Price is required for intraday short sell margin check');
+      }
+      // This sell (or part of it) is opening a short — check wallet
+      const wallet = await this.prisma.wallet.findUnique({
+        where: { userId: data.userId },
+      });
+
+      const required = new Prisma.Decimal(data.price).mul(shortQty).div(5);
+      const available = wallet ? wallet.balance : new Prisma.Decimal(0);
+
+      if (available.lt(required)) {
+        throw new BadRequestException(
+          `Insufficient balance for intraday short sell. ` +
+          `Required margin: ₹${required.toFixed(2)}, ` +
+          `Available: ₹${available.toFixed(2)}`
+        );
+      }
+    }
   }
 
-  async prepareFunds(data: any): Promise<void> {
+  // ── prepareFunds ───────────────────────────────────────────────────────────
+  async prepareFunds(data: PlaceOrderInput, tx: any = this.prisma): Promise<void> {
     if (data.side === OrderSide.BUY) {
-      // 5× leverage: lock only 20% margin
-      const margin = new Prisma.Decimal(data.price).mul(data.quantity).div(5);
-      await this.wallet.lockFunds(data.userId, margin);
+      if (data.price == null) {
+        throw new BadRequestException('Price is required for intraday BUY orders');
+      }
+      // Long position: lock 20% margin
+      const margin = calculateIntradayMargin(Number(data.price), Number(data.quantity));
+      await this.wallet.lockFunds(data.userId, margin, tx);
+      return;
     }
-    // SELL: no fund prep — settlement handles position update atomically
+
+    // SELL — determine how much is closing a long vs opening a short
+    const tradingDate  = this.getTradingDate();
+    const existingPos  = await tx.position.findUnique({
+      where: {
+        userId_stockId_tradingDate: {
+          userId:  data.userId,
+          stockId: data.stockId,
+          tradingDate,
+        },
+      },
+    });
+
+    const netLongQty = existingPos
+      ? Math.max(existingPos.buyQty - existingPos.sellQty, 0)
+      : 0;
+
+    // Closing existing longs: margin already locked at BUY time, nothing to do
+    // Opening new shorts: lock 20% margin
+    const shortQty = Math.max(data.quantity - netLongQty, 0);
+    if (shortQty > 0) {
+      if (data.price == null) {
+        throw new BadRequestException('Price is required for intraday short sell orders');
+      }
+      const shortMargin = calculateIntradayMargin(Number(data.price), Number(shortQty));
+      await this.wallet.lockFunds(data.userId, shortMargin, tx);
+    }
   }
 
-  async releaseFunds(order: any, unfilledQty: number, tx: any): Promise<void> {
-    if (order.side === OrderSide.BUY && order.price && unfilledQty > 0) {
-      const margin = new Prisma.Decimal(Number(order.price) * unfilledQty).div(5);
+  // ── releaseFunds ───────────────────────────────────────────────────────────
+  async releaseFunds(order: ReleaseFundsOrder, unfilledQty: number, tx: any): Promise<void> {
+    if (unfilledQty <= 0) return;
+
+    if (order.side === OrderSide.BUY) {
+      if (order.price == null) {
+        throw new BadRequestException('Cannot release intraday BUY margin without order price');
+      }
+      const margin = calculateIntradayMargin(Number(order.price), Number(unfilledQty));
       await this.wallet.releaseFunds(order.userId, margin, tx);
+      return;
     }
-    // SELL intraday cancel: nothing to undo — position was never touched at order time
+
+    // SELL cancel: release the short margin that was locked (if any)
+    const tradingDate  = this.getTradingDate();
+    const existingPos  = await tx.position.findUnique({
+      where: {
+        userId_stockId_tradingDate: {
+          userId:  order.userId,
+          stockId: order.stockId,
+          tradingDate,
+        },
+      },
+    });
+
+    const netLongQty = existingPos
+      ? Math.max(existingPos.buyQty - existingPos.sellQty, 0)
+      : 0;
+
+    // For the unfilled qty, figure out what was short vs closing-long
+    const closingQty = Math.min(unfilledQty, netLongQty);
+    const shortQty   = unfilledQty - closingQty;
+
+    if (shortQty > 0) {
+      if (order.price == null) {
+        throw new BadRequestException('Cannot release intraday short margin without order price');
+      }
+      const shortMargin = calculateIntradayMargin(Number(order.price), Number(shortQty));
+      await this.wallet.releaseFunds(order.userId, shortMargin, tx);
+    }
+    // closingQty portion: the long's margin stays locked until the long actually fills/cancels
+  }
+
+  private getTradingDate(): Date {
+    const now = new Date();
+    const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+    return new Date(
+      Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate())
+    );
   }
 }

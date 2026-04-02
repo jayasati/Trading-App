@@ -8,9 +8,10 @@ import {
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { SubscribeMessage,MessageBody,ConnectedSocket } from '@nestjs/websockets';
+import { getAllowedWsOrigins } from '../../../common/utils/cors-origins';
 
 @WebSocketGateway({
-  cors: { origin: '*' },
+  cors: { origin: getAllowedWsOrigins(), credentials: true },
 })
 export class MarketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

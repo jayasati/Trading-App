@@ -4,16 +4,30 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { WalletService } from '../wallet/wallet.service';
 import { Prisma, PositionStatus } from '../../generated/prisma/client';
 import { RedisService } from '../../common/redis/redis.service';
+import { calculateIntradayMargin } from '../../common/utils/intraday-margin';
 
 @Injectable()
 export class PositionsService {
   private readonly logger = new Logger(PositionsService.name);
+  private readonly redisGetTimeoutMs = 50;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly wallet: WalletService,
     private readonly redis:   RedisService,
   ) {}
+
+  private async getRedisStringWithTimeout(key: string): Promise<string | null> {
+    const client = this.redis.getClient();
+    if (!client) return null;
+
+    return await Promise.race([
+      client.get(key),
+      new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), this.redisGetTimeoutMs),
+      ),
+    ]);
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   // getTradingDate — returns today's date at midnight IST
@@ -157,13 +171,11 @@ export class PositionsService {
         // Key written by MarketCacheService: `price:{stockId}`
         let livePrice = avgBuy; // safe fallback
         try {
-          const cached = await this.prisma.$queryRawUnsafe<{ val: string | null }[]>(
-            `SELECT NULL as val` // placeholder — we use RedisService below
-          );
-          // RedisService is not injected here yet — inject it in the constructor.
-          // See constructor fix below.
-          const redisVal = await this.redis.getClient().get(`price:${pos.stockId}`);
-          if (redisVal) livePrice = Number(redisVal);
+          const redisVal = await this.getRedisStringWithTimeout(`price:${pos.stockId}`);
+          if (redisVal != null) {
+            const parsed = Number(redisVal);
+            if (Number.isFinite(parsed) && parsed > 0) livePrice = parsed;
+          }
         } catch {
           // Redis unavailable — livePrice stays as avgBuy fallback
         }
@@ -198,18 +210,17 @@ export class PositionsService {
 
     return enriched;
   }
-
-// ── autoSquareOff ── called by cron at 3:20 PM IST ──────────────────────────
-  // For intraday BUY positions:
-  //   - At order time: wallet locked only 20% margin (price × qty / 5)
-  //   - At square-off : we need to return PnL to wallet, not the full trade value
+// ── autoSquareOff ── called by cron at 3:20 PM IST ──────────────────────
   //
-  // Formula:
-  //   pnl            = (squareOffPrice - avgBuyPrice) × qty
-  //   marginReturned = margin originally locked = avgBuyPrice × qty / 5
-  //   creditAmount   = marginReturned + pnl
+  // LONG position square-off:
+  //   At BUY time:  margin locked = avgBuyPrice × qty / 5
+  //   At sq-off:    credit = margin + P&L
+  //                        = (avgBuyPrice × qty / 5) + (squareOffPrice - avgBuyPrice) × qty
   //
-  // This keeps the wallet consistent regardless of profit or loss.
+  // SHORT position square-off (user sold without buying first):
+  //   No margin was locked at sell time.
+  //   At sq-off:    credit = (avgSellPrice - squareOffPrice) × qty  [capped at 0]
+  //
   async autoSquareOff(
     stockId:  string,
     userId:   string,
@@ -223,21 +234,61 @@ export class PositionsService {
         where: { userId, stockId, tradingDate },
       });
 
-      if (position) {
-        const avgBuy   = Number(position.avgBuyPrice);
-        const margin   = new Prisma.Decimal(avgBuy * quantity).div(5);   // 20% originally locked
-        const pnl      = new Prisma.Decimal((price - avgBuy) * quantity); // can be negative
-        const credit   = margin.add(pnl);                                  // return margin ± pnl
+      if (!position) {
+        this.logger.warn(
+          `autoSquareOff: no position found for userId=${userId} stockId=${stockId} date=${tradingDate}`
+        );
+        return;
+      }
 
-        // Only credit if result is positive (don't go below 0)
-        const safeCredit = credit.gt(0) ? credit : new Prisma.Decimal(0);
+      const avgBuyPrice  = Number(position.avgBuyPrice);
+      const avgSellPrice = Number(position.avgSellPrice);
+      const netLongQty   = position.buyQty - position.sellQty;  // positive = long
+      const netShortQty  = position.sellQty - position.buyQty;  // positive = short
+
+      let credit = new Prisma.Decimal(0);
+      let sqQty = 0;
+
+      if (netLongQty > 0) {
+        // ── Squaring off a LONG position ─────────────────────────────────
+        // margin originally locked = avgBuyPrice × qty / 5
+        // pnl = (squareOffPrice - avgBuyPrice) × qty
+        // credit = margin + pnl  (can be negative if loss; cap at 0)
+        sqQty = Math.min(quantity, netLongQty);
+        const margin = calculateIntradayMargin(avgBuyPrice, sqQty);
+        const pnl    = new Prisma.Decimal((price - avgBuyPrice) * sqQty);
+        credit       = margin.add(pnl);
+
+      } else if (netShortQty > 0) {
+        // ── Squaring off a SHORT position ────────────────────────────────
+        // No margin was locked. Profit = sold high, covering low.
+        // credit = (avgSellPrice - coverPrice) × qty  [capped at 0 for losses]
+        sqQty = Math.min(quantity, netShortQty);
+        const shortProfit = new Prisma.Decimal((avgSellPrice - price) * sqQty);
+        credit           = shortProfit;
+      }
+
+      if (sqQty <= 0) {
+        this.logger.log(
+          `autoSquareOff: nothing to square off for userId=${userId} stockId=${stockId} date=${tradingDate}`
+        );
+        return;
+      }
+
+      // Never credit a negative amount
+      const safeCredit = credit.gt(0) ? credit : new Prisma.Decimal(0);
+      if (safeCredit.gt(0)) {
         await this.wallet.creditBalance(userId, safeCredit, tx);
+      }
 
-        const newSellQty   = position.sellQty + quantity;
+      // Update position record (LONG: sell to close, SHORT: buy to cover)
+      if (netLongQty > 0) {
+        const newSellQty   = position.sellQty + sqQty;
         const newSellValue = new Prisma.Decimal(position.sellValue).add(
-          new Prisma.Decimal(price * quantity)
+          new Prisma.Decimal(price * sqQty)
         );
         const newAvgSell   = newSellValue.div(newSellQty);
+        const remainingLongQty = Math.max(netLongQty - sqQty, 0);
 
         await tx.position.update({
           where: { id: position.id },
@@ -245,20 +296,36 @@ export class PositionsService {
             sellQty:      newSellQty,
             sellValue:    newSellValue,
             avgSellPrice: newAvgSell,
-            quantity:     0,
-            status:       PositionStatus.SQUARED_OFF,
+            quantity:     remainingLongQty,
+            status:       remainingLongQty === 0 ? PositionStatus.SQUARED_OFF : PositionStatus.OPEN,
           },
         });
-
-        this.logger.log(
-          `Auto square-off: ${quantity} × stockId=${stockId} for userId=${userId} ` +
-          `@ ₹${price} | margin=₹${margin} pnl=₹${pnl} credit=₹${safeCredit}`
-        );
       } else {
-        this.logger.warn(
-          `autoSquareOff: no position found for userId=${userId} stockId=${stockId} date=${tradingDate}`
+        // SHORT square-off is a BUY (cover), so we increase buyQty/buyValue.
+        const newBuyQty   = position.buyQty + sqQty;
+        const newBuyValue = new Prisma.Decimal(position.buyValue).add(
+          new Prisma.Decimal(price * sqQty)
         );
+        const newAvgBuy   = newBuyValue.div(newBuyQty);
+        const remainingShortQty = Math.max(netShortQty - sqQty, 0);
+
+        await tx.position.update({
+          where: { id: position.id },
+          data: {
+            buyQty:      newBuyQty,
+            buyValue:    newBuyValue,
+            avgBuyPrice: newAvgBuy,
+            quantity:    0, // this field tracks only net LONG qty in this model
+            status:      remainingShortQty === 0 ? PositionStatus.SQUARED_OFF : PositionStatus.OPEN,
+          },
+        });
       }
+
+      this.logger.log(
+        `Auto square-off: ${sqQty} × stockId=${stockId} for userId=${userId} ` +
+        `@ ₹${price} | credit=₹${safeCredit} ` +
+        `(${netLongQty > 0 ? 'LONG' : 'SHORT'})`
+      );
     });
   }
   // ─────────────────────────────────────────────────────────────────────────
