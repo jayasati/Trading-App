@@ -189,9 +189,9 @@ export class TradeSettlementService {
     const openLongQty = quantity - coverQty;
 
     if (coverQty > 0) {
-      // Undo the buy-margin lock for the covered quantity.
-      const buyMarginCover = calculateIntradayMargin(buyPrice, coverQty);
-      await this.wallet.releaseFunds(buyerId, buyMarginCover, tx);
+      // No buy-margin to release for the cover portion — prepareFunds
+      // intentionally does not lock margin when a BUY is covering a short
+      // (the short's collateral is already locked).
 
       const avgSellPrice = existingPos ? Number(existingPos.avgSellPrice) : 0;
       if (avgSellPrice <= 0) {
@@ -222,9 +222,6 @@ export class TradeSettlementService {
     if (openLongQty > 0) {
       const buyMarginOpenLong = calculateIntradayMargin(buyPrice, openLongQty);
       await this.wallet.consumeLockedFunds(buyerId, buyMarginOpenLong, tx);
-    } else if (coverQty > 0) {
-      // We released the covered portion; if the user locked more than needed for some reason,
-      // we do not touch it here.
     }
 
     await this.positions.addBuy(buyerId, stockId, quantity, buyPrice, tx);

@@ -69,9 +69,31 @@ export class IntradayOrderStrategy implements OrderStrategy {
       if (data.price == null) {
         throw new BadRequestException('Price is required for intraday BUY orders');
       }
-      // Long position: lock 20% margin
-      const margin = calculateIntradayMargin(Number(data.price), Number(data.quantity));
-      await this.wallet.lockFunds(data.userId, margin, tx);
+
+      // A BUY that covers an existing short must NOT lock new margin —
+      // the short's collateral is already locked. Only the portion that
+      // opens a new long needs 20% margin.
+      const tradingDate = this.getTradingDate();
+      const existingPos = await tx.position.findUnique({
+        where: {
+          userId_stockId_tradingDate: {
+            userId:  data.userId,
+            stockId: data.stockId,
+            tradingDate,
+          },
+        },
+      });
+
+      const netShortQty = existingPos
+        ? Math.max(existingPos.sellQty - existingPos.buyQty, 0)
+        : 0;
+      const coverQty    = Math.min(Number(data.quantity), netShortQty);
+      const openLongQty = Number(data.quantity) - coverQty;
+
+      if (openLongQty > 0) {
+        const margin = calculateIntradayMargin(Number(data.price), openLongQty);
+        await this.wallet.lockFunds(data.userId, margin, tx);
+      }
       return;
     }
 
@@ -111,8 +133,31 @@ export class IntradayOrderStrategy implements OrderStrategy {
       if (order.price == null) {
         throw new BadRequestException('Cannot release intraday BUY margin without order price');
       }
-      const margin = calculateIntradayMargin(Number(order.price), Number(unfilledQty));
-      await this.wallet.releaseFunds(order.userId, margin, tx);
+
+      // Margin was only locked for the open-long portion at place time.
+      // Re-derive coverQty from current position state to release the
+      // matching portion of the unfilled qty.
+      const tradingDate = this.getTradingDate();
+      const existingPos = await tx.position.findUnique({
+        where: {
+          userId_stockId_tradingDate: {
+            userId:  order.userId,
+            stockId: order.stockId,
+            tradingDate,
+          },
+        },
+      });
+
+      const netShortQty   = existingPos
+        ? Math.max(existingPos.sellQty - existingPos.buyQty, 0)
+        : 0;
+      const coverUnfilled = Math.min(unfilledQty, netShortQty);
+      const openLongUnfilled = unfilledQty - coverUnfilled;
+
+      if (openLongUnfilled > 0) {
+        const margin = calculateIntradayMargin(Number(order.price), openLongUnfilled);
+        await this.wallet.releaseFunds(order.userId, margin, tx);
+      }
       return;
     }
 
